@@ -25,6 +25,15 @@ import {
   type Outcome,
   type SessionRow,
 } from './db/sessions.ts';
+import {
+  migrateSettings,
+  setSetting,
+  setJsonSetting,
+  hasCompletedOnboarding,
+  ONBOARDING_COMPLETED_AT,
+  DIAGNOSTIC_ANSWERS,
+} from './db/settings.ts';
+import { runOnboarding } from './onboarding/screen.ts';
 import { stationState } from './engine/station.ts';
 import { stationView } from './station/view.ts';
 import { renderStation, playResponse } from './station/render.ts';
@@ -173,6 +182,24 @@ async function finish(outcome: Outcome) {
   await render();
 }
 
+function selectDuration(minutes: number) {
+  plannedMinutes = minutes;
+  const group = document.querySelector('.duration');
+  if (!group) return;
+  let match = group.querySelector<HTMLButtonElement>(`button[data-minutes="${minutes}"]`);
+  if (!match) {
+    // The diagnostic can propose a length the fixed buttons do not offer.
+    // Offer it rather than silently rounding the person's first session.
+    match = document.createElement('button');
+    match.type = 'button';
+    match.dataset.minutes = String(minutes);
+    match.textContent = `${minutes}m`;
+    group.prepend(match);
+  }
+  for (const other of group.querySelectorAll('button')) other.removeAttribute('aria-pressed');
+  match.setAttribute('aria-pressed', 'true');
+}
+
 function wireDurations() {
   const group = document.querySelector('.duration');
   if (!group) return;
@@ -189,6 +216,7 @@ async function boot() {
   try {
     db = (await Database.load(DB_URL)) as unknown as Db;
     await migrate(db);
+    await migrateSettings(db);
   } catch (error) {
     say(
       `Could not open the database. Your history is untouched. ${
@@ -198,6 +226,15 @@ async function boot() {
     );
     return;
   }
+
+  el('begin').addEventListener('click', () => void begin());
+  el('finished').addEventListener('click', () => void finish('finished'));
+  el('cut_short').addEventListener('click', () => void finish('cut_short'));
+  el('abandoned').addEventListener('click', () => void finish('abandoned'));
+  el('intention').addEventListener('keydown', (event) => {
+    if ((event as KeyboardEvent).key === 'Enter') void begin();
+  });
+  wireDurations();
 
   // Anything a crash left open is closed at its last heartbeat and named out
   // loud. A session that vanishes silently is the worst failure this app has.
@@ -210,21 +247,27 @@ async function boot() {
     );
   }
 
-  el('begin').addEventListener('click', () => void begin());
-  el('finished').addEventListener('click', () => void finish('finished'));
-  el('cut_short').addEventListener('click', () => void finish('cut_short'));
-  el('abandoned').addEventListener('click', () => void finish('abandoned'));
-  el('intention').addEventListener('keydown', (event) => {
-    if ((event as KeyboardEvent).key === 'Enter') void begin();
-  });
-  wireDurations();
-
   // A last heartbeat on the way out narrows what a hard kill can lose.
   window.addEventListener('beforeunload', () => {
     if (openId !== null) void touchSession(db, openId, now());
   });
 
   await render();
+
+  // First run. Everything above is already wired, so if this is interrupted the
+  // app underneath is in a working state rather than half built.
+  if (!(await hasCompletedOnboarding(db))) {
+    const { answers, reading } = await runOnboarding(el('onboarding'));
+    try {
+      await setJsonSetting(db, DIAGNOSTIC_ANSWERS, answers);
+      await setSetting(db, ONBOARDING_COMPLETED_AT, String(now()));
+    } catch (error) {
+      // Losing the answers is survivable. Blocking the first session is not.
+      console.error('Could not save the diagnostic:', error);
+    }
+    selectDuration(reading.suggestedMinutes);
+    el<HTMLInputElement>('intention').focus();
+  }
 }
 
 window.addEventListener('DOMContentLoaded', () => void boot());

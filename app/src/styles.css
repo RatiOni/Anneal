@@ -484,3 +484,134 @@ button:disabled {
     border-bottom: 1px solid var(--line);
   }
 }
+
+/* ---------- first run ---------- */
+/* One thing on screen at a time. No tour, no modal stack, no progress bar
+   with a filled track. Just a counter and a question. */
+.onboarding {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: var(--ground);
+  padding: 40px 28px;
+  overflow: auto;
+}
+
+.onb-panel {
+  width: 100%;
+  max-width: 640px;
+}
+
+.onb-counter {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.onb-spaced {
+  margin-top: 30px;
+}
+
+.onb-question,
+.onb-observation {
+  font-size: clamp(24px, 3.4vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin-top: 12px;
+  max-width: 30ch;
+}
+.onb-observation {
+  max-width: 34ch;
+}
+
+.onb-change {
+  font-size: var(--fs-lg);
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-top: 10px;
+  max-width: 54ch;
+}
+
+.onb-choices {
+  display: grid;
+  gap: 1px;
+  margin-top: 28px;
+  border: 1px solid var(--line-bright);
+  background: var(--line-bright);
+}
+
+.onb-choice {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 15px 18px;
+  text-align: left;
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: var(--fs-base);
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+.onb-choice:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.onb-choice[aria-pressed='true'] {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.onb-choice:focus-visible {
+  outline: 2px solid var(--ember-colour);
+  outline-offset: -2px;
+}
+.onb-key {
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  min-width: 1ch;
+}
+
+.onb-primary {
+  display: inline-block;
+  margin-top: 32px;
+  padding: 14px 32px;
+  background: var(--ember-colour);
+  color: #140d07;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:
+    background-color 200ms ease,
+    transform 120ms ease;
+}
+.onb-primary:hover {
+  background: var(--ember-lift);
+}
+.onb-primary:active {
+  transform: translateY(1px);
+}
+.onb-primary:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.onb-back {
+  display: block;
+  margin-top: 18px;
+  padding: 4px 0;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 200ms ease;
+}
+.onb-back:hover {
+  color: var(--text-2);
+}
+.onb-back:focus-visible {
+  outline: 2px solid var(--ember-colour);
+  outline-offset: 2px;
+}
