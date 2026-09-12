@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anneal</title>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="wordmark">Ann<span>eal</span></div>
+        <div class="readouts">
+          <div class="readout">
+            <span class="k">Last 14 days</span><span class="v mono" data-field="week">0h 0m</span>
+          </div>
+          <div class="readout">
+            <span class="k">Cumulative</span><span class="v mono" data-field="cumulative">0h</span>
+          </div>
+          <div class="readout">
+            <span class="k">Light</span><span class="v mono" data-field="light">0.00</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="stage">
+        <!-- Station. Every dynamic element is addressed by data attribute and
+             styled by CSS from its state. See src/station/render.ts. -->
+        <section class="station" id="station" aria-label="Station">
+          <div class="station-meta">
+            <h1 class="name" data-field="headline">Loading.</h1>
+            <p class="state" data-field="detail"></p>
+          </div>
+
+          <svg viewBox="0 0 900 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <defs>
+              <radialGradient id="glowGrad" cx="50%" cy="62%" r="34%">
+                <stop offset="0%" stop-color="#d2702f" stop-opacity="0.9" />
+                <stop offset="48%" stop-color="#d2702f" stop-opacity="0.18" />
+                <stop offset="100%" stop-color="#d2702f" stop-opacity="0" />
+              </radialGradient>
+              <pattern
+                id="hatch"
+                width="6"
+                height="6"
+                patternTransform="rotate(45)"
+                patternUnits="userSpaceOnUse"
+              >
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#342d28" stroke-width="1" />
+              </pattern>
+            </defs>
+
+            <ellipse class="glow" cx="452" cy="352" rx="280" ry="150" fill="url(#glowGrad)" />
+
+            <!-- loft: 12 weeks active -->
+            <g class="structure" data-structure="loft" data-state="dormant">
+              <path class="edge" d="M312 168 L312 104 L592 104 L592 168" fill="none" />
+              <line class="edge" x1="352" y1="104" x2="352" y2="168" />
+              <line class="edge" x1="452" y1="104" x2="452" y2="168" />
+              <line class="edge" x1="552" y1="104" x2="552" y2="168" />
+              <text class="req mono" data-role="requirement" x="600" y="120"></text>
+            </g>
+
+            <!-- forge: always present -->
+            <g class="structure" data-structure="forge" data-state="unlocked">
+              <line class="edge" x1="434" y1="196" x2="434" y2="172" />
+              <line class="edge" x1="470" y1="196" x2="470" y2="172" />
+              <path
+                class="body"
+                d="M336 196 L360 172 L544 172 L568 196 L568 400 L336 400 Z"
+                fill="#191614"
+              />
+              <line class="edge" x1="336" y1="196" x2="568" y2="196" />
+              <rect class="edge hatched" x="336" y="352" width="232" height="48" />
+              <rect class="mouth" x="392" y="238" width="120" height="86" fill="#0e0b09" />
+              <rect class="ember" x="404" y="252" width="96" height="60" fill="#d2702f" />
+              <g class="grate">
+                <line x1="404" y1="282" x2="500" y2="282" />
+                <line x1="436" y1="252" x2="436" y2="312" />
+                <line x1="468" y1="252" x2="468" y2="312" />
+              </g>
+            </g>
+
+            <!-- bench -->
+            <line class="edge bench" x1="150" y1="400" x2="762" y2="400" />
+            <line class="hair" x1="150" y1="408" x2="762" y2="408" />
+            <line class="edge" x1="196" y1="408" x2="196" y2="474" />
+            <line class="edge" x1="716" y1="408" x2="716" y2="474" />
+            <line class="edge" x1="196" y1="452" x2="716" y2="452" />
+            <line class="hair" x1="120" y1="474" x2="792" y2="474" />
+
+            <!-- bellows: 40 hours -->
+            <g class="structure" data-structure="bellows" data-state="dormant">
+              <path class="edge" d="M212 306 L296 284 L296 356 L212 334 Z" fill="none" />
+              <line class="edge" x1="234" y1="300" x2="234" y2="340" />
+              <line class="edge" x1="256" y1="294" x2="256" y2="346" />
+              <line class="edge" x1="278" y1="289" x2="278" y2="351" />
+              <line class="edge" x1="296" y1="320" x2="336" y2="320" />
+              <text class="req mono" data-role="requirement" x="206" y="274" text-anchor="end"></text>
+            </g>
+
+            <!-- rack: 10 hours. Holds the marks. -->
+            <g class="structure" data-structure="rack" data-state="dormant">
+              <line class="edge" x1="604" y1="256" x2="744" y2="256" />
+              <g class="marks">
+                <line data-mark="0" style="display:none" x1="612" y1="256" x2="612" y2="318" />
+                <line data-mark="1" style="display:none" x1="620" y1="256" x2="620" y2="300" />
+                <line data-mark="2" style="display:none" x1="628" y1="256" x2="628" y2="330" />
+                <line data-mark="3" style="display:none" x1="636" y1="256" x2="636" y2="292" />
+                <line data-mark="4" style="display:none" x1="644" y1="256" x2="644" y2="322" />
+                <line data-mark="5" style="display:none" x1="652" y1="256" x2="652" y2="306" />
+                <line data-mark="6" style="display:none" x1="660" y1="256" x2="660" y2="338" />
+                <line data-mark="7" style="display:none" x1="668" y1="256" x2="668" y2="288" />
+                <line data-mark="8" style="display:none" x1="676" y1="256" x2="676" y2="314" />
+                <line data-mark="9" style="display:none" x1="684" y1="256" x2="684" y2="298" />
+                <line data-mark="10" style="display:none" x1="692" y1="256" x2="692" y2="326" />
+                <line data-mark="11" style="display:none" x1="700" y1="256" x2="700" y2="304" />
+                <line data-mark="12" style="display:none" x1="708" y1="256" x2="708" y2="334" />
+                <line data-mark="13" style="display:none" x1="716" y1="256" x2="716" y2="294" />
+                <line data-mark="14" style="display:none" x1="724" y1="256" x2="724" y2="320" />
+                <line data-mark="15" style="display:none" x1="732" y1="256" x2="732" y2="310" />
+              </g>
+              <text class="overflow mono" data-field="marks-overflow" x="748" y="264"></text>
+              <text class="req mono" data-role="requirement" x="750" y="252"></text>
+            </g>
+
+            <!-- anvil: 100 hours -->
+            <g class="structure" data-structure="anvil" data-state="dormant">
+              <path class="edge" d="M196 356 L276 356 L268 372 L252 372 L252 400 L220 400 L220 372 L204 372 Z" fill="none" />
+              <text class="req mono" data-role="requirement" x="196" y="346"></text>
+            </g>
+
+            <!-- quench tank: 200 hours -->
+            <g class="structure" data-structure="quench" data-state="dormant">
+              <path class="edge" d="M604 356 L604 400 L744 400 L744 356" fill="none" />
+              <line class="edge" x1="612" y1="372" x2="736" y2="372" />
+              <text class="req mono" data-role="requirement" x="604" y="346"></text>
+            </g>
+
+            <!-- dimension line -->
+            <g class="dim">
+              <line x1="336" y1="496" x2="568" y2="496" />
+              <path d="M332 490 L340 502 M572 490 L564 502" />
+              <line x1="336" y1="410" x2="336" y2="496" />
+              <line x1="568" y1="410" x2="568" y2="496" />
+            </g>
+            <text class="req mono" x="452" y="490" text-anchor="middle">FORGE 02</text>
+          </svg>
+
+          <div class="station-legend">
+            <span>Structures <b class="mono" data-field="legend-structures">0 of 6</b></span>
+            <span>Marks <b class="mono" data-field="legend-marks">0</b></span>
+            <span>Last worked <b class="mono" data-field="legend-last">never</b></span>
+          </div>
+        </section>
+
+        <aside class="rail">
+          <div class="rail-block">
+            <h2>What are you working on</h2>
+            <input
+              id="intention"
+              class="intent-field"
+              type="text"
+              maxlength="200"
+              autocomplete="off"
+            />
+            <div class="duration" role="group" aria-label="Session length">
+              <button type="button" data-minutes="25">25m</button>
+              <button type="button" data-minutes="50" aria-pressed="true">50m</button>
+              <button type="button" data-minutes="90">90m</button>
+            </div>
+            <button id="begin" class="begin" type="button">Begin</button>
+            <p id="running" class="running"></p>
+            <p id="message" class="message" data-error="false" role="status"></p>
+            <div class="ending" role="group" aria-label="End the session">
+              <button id="finished" type="button">Finished</button>
+              <button id="cut_short" type="button">Cut short</button>
+              <button id="abandoned" type="button">Abandoned</button>
+            </div>
+          </div>
+
+          <div class="log">
+            <h2>Recent</h2>
+            <ul id="log"></ul>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

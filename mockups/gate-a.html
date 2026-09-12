@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gate A mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   STATIC MOCKUP. All figures below are mock data, clearly
+   fictional, used to show layout and register only.
+   Theme is locked dark by brand decision (see plans/02-design-system.md).
+   Corner radius system: all-sharp, 0px. Locked.
+   Accent: ember. One accent, whole page. Locked.
+   ============================================================ */
+
+:root{
+  --ground:      #131110;
+  --surface:     #1a1715;
+  --surface-2:   #211d1a;
+  --line:        #2c2724;
+  --line-bright: #3c3531;
+  --text:        #e9e2d9;
+  --text-2:      #9a9188;
+  --text-3:      #8b827a;
+  --ember:       #d2702f;
+  --ember-dim:   #7a4520;
+  --steel:       #7d97a6;
+  --negative:    #96604f;
+
+  --fs-micro: 10.5px;
+  --fs-sm:    12px;
+  --fs-base:  14px;
+  --fs-lg:    18px;
+  --fs-xl:    26px;
+  --fs-2xl:   44px;
+  --fs-3xl:   68px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--ground);
+  color:var(--text);
+  font-family:'Archivo',system-ui,sans-serif;
+  font-size:var(--fs-base);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+
+/* ---------- app frame ---------- */
+.app{display:grid;grid-template-rows:auto 1fr auto;height:100dvh}
+
+.topbar{
+  display:flex;align-items:center;gap:28px;
+  height:56px;padding:0 22px;
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+}
+.wordmark{
+  font-weight:700;font-size:var(--fs-base);
+  letter-spacing:.14em;text-transform:uppercase;
+}
+.wordmark span{color:var(--ember)}
+
+.readouts{display:flex;gap:26px;margin-left:auto}
+.readout{display:flex;flex-direction:column;gap:1px;text-align:right}
+.readout .k{font-size:var(--fs-micro);color:var(--text-3);letter-spacing:.1em;text-transform:uppercase}
+.readout .v{font-size:var(--fs-base);font-weight:500;color:var(--text)}
+
+.viewswitch{display:flex;border:1px solid var(--line-bright)}
+.viewswitch button{
+  padding:6px 14px;font-size:var(--fs-sm);color:var(--text-2);
+  transition:color .2s ease, background-color .2s ease;
+}
+.viewswitch button + button{border-left:1px solid var(--line-bright)}
+.viewswitch button[aria-pressed="true"]{background:var(--surface-2);color:var(--text)}
+.viewswitch button:focus-visible{outline:2px solid var(--ember);outline-offset:-2px}
+
+/* ---------- main view ---------- */
+.stage{display:grid;grid-template-columns:1fr 340px;min-height:0}
+.station{
+  position:relative;overflow:hidden;
+  border-right:1px solid var(--line);
+  background:
+    radial-gradient(120% 90% at 50% 108%, rgba(210,112,47,.13), transparent 62%),
+    var(--ground);
+}
+.station svg{position:absolute;inset:0;width:100%;height:100%}
+
+.station-meta{
+  position:absolute;left:22px;top:20px;
+  display:flex;flex-direction:column;gap:5px;
+}
+.station-meta .name{font-size:var(--fs-lg);font-weight:600;letter-spacing:-.01em}
+.station-meta .state{font-size:var(--fs-sm);color:var(--text-2);max-width:34ch;line-height:1.5}
+
+.station-legend{
+  position:absolute;left:22px;bottom:18px;
+  display:flex;gap:20px;font-size:var(--fs-micro);color:var(--text-3);
+  letter-spacing:.08em;text-transform:uppercase;
+  background:var(--ground);padding:6px 10px 6px 0;
+}
+.station-legend b{color:var(--text-2);font-weight:500}
+
+/* ---------- side rail ---------- */
+.rail{display:flex;flex-direction:column;min-height:0;background:var(--surface)}
+.rail-block{padding:20px 20px 18px;border-bottom:1px solid var(--line)}
+.rail-block h2{
+  font-size:var(--fs-micro);font-weight:600;color:var(--text-3);
+  letter-spacing:.13em;text-transform:uppercase;margin-bottom:12px;
+}
+
+.intent-field{
+  width:100%;background:var(--ground);
+  border:1px solid var(--line-bright);
+  padding:11px 12px;font:inherit;color:var(--text);
+  transition:border-color .2s ease;
+}
+.intent-field::placeholder{color:var(--text-3)}
+.intent-field:focus{outline:none;border-color:var(--ember)}
+
+.recent-row{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.chip{
+  border:1px solid var(--line-bright);padding:4px 9px;
+  font-size:var(--fs-sm);color:var(--text-2);
+  transition:border-color .2s ease,color .2s ease;
+}
+.chip:hover{border-color:var(--text-3);color:var(--text)}
+
+.duration{display:flex;margin-top:14px;border:1px solid var(--line-bright)}
+.duration button{
+  flex:1;padding:9px 0;text-align:center;
+  font-size:var(--fs-sm);color:var(--text-2);
+  transition:background-color .2s ease,color .2s ease;
+}
+.duration button + button{border-left:1px solid var(--line-bright)}
+.duration button[aria-pressed="true"]{background:var(--surface-2);color:var(--text)}
+
+.begin{
+  display:block;width:100%;margin-top:14px;padding:13px 0;
+  background:var(--ember);color:#140d07;
+  font-weight:600;font-size:var(--fs-base);
+  letter-spacing:.06em;text-transform:uppercase;
+  transition:transform .12s ease, background-color .2s ease;
+}
+.begin:hover{background:#e07c38}
+.begin:active{transform:translateY(1px)}
+.begin:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+
+.log{flex:1;overflow:auto;padding:18px 20px}
+.log h2{
+  font-size:var(--fs-micro);font-weight:600;color:var(--text-3);
+  letter-spacing:.13em;text-transform:uppercase;margin-bottom:12px;
+}
+.entry{display:grid;grid-template-columns:52px 1fr auto;gap:11px;align-items:baseline;padding:8px 0}
+.entry + .entry{border-top:1px solid var(--line)}
+.entry .t{font-size:var(--fs-sm);color:var(--text-3)}
+.entry .what{font-size:var(--fs-base);color:var(--text);line-height:1.35}
+.entry .what em{display:block;font-style:normal;font-size:var(--fs-sm);color:var(--text-2);margin-top:2px}
+.entry .d{font-size:var(--fs-sm);color:var(--text-2)}
+.entry.partial .d{color:var(--negative)}
+
+/* ---------- bottom strip ---------- */
+.strip{
+  display:flex;align-items:center;gap:18px;
+  height:62px;padding:0 22px;
+  border-top:1px solid var(--line);background:var(--surface);
+}
+.strip .k{
+  font-size:var(--fs-micro);color:var(--text-3);
+  letter-spacing:.13em;text-transform:uppercase;white-space:nowrap;
+}
+.bars{display:flex;align-items:flex-end;gap:3px;height:34px;flex:1}
+.bar{flex:1;background:var(--ember-dim);min-height:2px;transition:background-color .2s ease}
+.bar.hi{background:var(--ember)}
+.bar.zero{background:var(--line-bright)}
+.strip .tail{font-size:var(--fs-sm);color:var(--text-2);white-space:nowrap}
+
+/* ---------- review view ---------- */
+.review{overflow:auto;padding:28px 32px 40px}
+.review-head{display:flex;align-items:baseline;gap:16px;margin-bottom:6px}
+.review-head h1{font-size:var(--fs-xl);font-weight:600;letter-spacing:-.015em}
+.review-head .range{font-size:var(--fs-sm);color:var(--text-3)}
+.review-sub{font-size:var(--fs-base);color:var(--text-2);max-width:62ch;line-height:1.6;margin-bottom:30px}
+
+.finding{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
+  border-top:1px solid var(--line);
+}
+.finding > div{padding:26px 28px 26px 0}
+.finding > div + div{padding-left:28px;border-left:1px solid var(--line)}
+.finding h3{
+  font-size:var(--fs-micro);font-weight:600;color:var(--text-3);
+  letter-spacing:.13em;text-transform:uppercase;margin-bottom:4px;
+}
+.finding .q{font-size:var(--fs-sm);color:var(--text-2);margin-bottom:18px;line-height:1.5}
+
+.figure{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.figure .big{font-size:var(--fs-2xl);font-weight:600;letter-spacing:-.03em;line-height:1}
+.figure .unit{font-size:var(--fs-base);color:var(--text-2)}
+
+.chart{width:100%;height:150px;display:block}
+.chart text{font-family:'IBM Plex Mono',monospace;font-size:9.5px;fill:var(--text-3)}
+.grid-line{stroke:var(--line);stroke-width:1}
+.axis-line{stroke:var(--line-bright);stroke-width:1}
+
+.recommendation{
+  margin-top:36px;border-top:1px solid var(--line-bright);
+  border-left:2px solid var(--ember);
+  padding:22px 26px;background:var(--surface);
+}
+.recommendation h3{
+  font-size:var(--fs-micro);font-weight:600;color:var(--ember);
+  letter-spacing:.13em;text-transform:uppercase;margin-bottom:9px;
+}
+.recommendation p{font-size:var(--fs-lg);line-height:1.5;max-width:58ch;font-weight:500}
+.recommendation .why{font-size:var(--fs-sm);color:var(--text-2);margin-top:10px;max-width:62ch;line-height:1.6;font-weight:400}
+
+.hidden{display:none !important}
+
+/* ---------- motion, motivated and reducible ---------- */
+@keyframes emberBreathe{
+  0%,100%{opacity:.72}
+  50%{opacity:1}
+}
+.ember-core{animation:emberBreathe 6s ease-in-out infinite}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important}
+}
+
+@media (max-width:1100px){
+  .stage{grid-template-columns:1fr}
+  .station{border-right:none;border-bottom:1px solid var(--line);min-height:340px}
+  .finding{grid-template-columns:1fr}
+  .finding > div + div{padding-left:0;border-left:none;border-top:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="wordmark">Ann<span>eal</span></div>
+
+    <div class="viewswitch" role="group" aria-label="View">
+      <button id="btn-main" aria-pressed="true">Station</button>
+      <button id="btn-review" aria-pressed="false">Review</button>
+    </div>
+
+    <div class="readouts">
+      <div class="readout">
+        <span class="k">This week</span>
+        <span class="v mono">6h 12m</span>
+      </div>
+      <div class="readout">
+        <span class="k">Cumulative</span>
+        <span class="v mono">213h</span>
+      </div>
+      <div class="readout">
+        <span class="k">Light</span>
+        <span class="v mono">0.71</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== STATION VIEW ===================== -->
+  <main class="stage" id="view-main">
+    <section class="station" aria-label="Station">
+
+      <div class="station-meta">
+        <div class="name">The bench is warm.</div>
+        <div class="state">Four sessions in the last seven days. Two structures holding. Nothing lost.</div>
+      </div>
+
+      <!-- Data-driven schematic. Every element maps to a threshold in the
+           session record. Not decoration: this is the render target for the
+           station state function described in plans/01-product-ux.md. -->
+      <svg viewBox="0 0 900 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="62%" r="34%">
+            <stop offset="0%"   stop-color="#d2702f" stop-opacity=".40"/>
+            <stop offset="48%"  stop-color="#d2702f" stop-opacity=".08"/>
+            <stop offset="100%" stop-color="#d2702f" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#342d28" stroke-width="1"/>
+          </pattern>
+        </defs>
+
+        <ellipse class="ember-core" cx="452" cy="352" rx="280" ry="150" fill="url(#glow)"/>
+
+        <!-- ---------- flue, rises with cumulative hours ---------- -->
+        <g stroke="#4a423c" stroke-width="1.3" fill="none">
+          <line x1="434" y1="196" x2="434" y2="52"/>
+          <line x1="470" y1="196" x2="470" y2="52"/>
+          <line x1="426" y1="118" x2="478" y2="118"/>
+          <line x1="426" y1="122" x2="478" y2="122"/>
+          <line x1="426" y1="72"  x2="478" y2="72"/>
+          <line x1="426" y1="76"  x2="478" y2="76"/>
+        </g>
+        <g stroke="#342d28" stroke-width="1" fill="none">
+          <path d="M434 118 L404 104 M470 118 L500 104"/>
+        </g>
+
+        <!-- ---------- body of the forge ---------- -->
+        <path d="M336 196 L360 172 L544 172 L568 196 L568 400 L336 400 Z"
+              fill="#191614" stroke="#5a514a" stroke-width="1.5"/>
+        <path d="M336 196 L568 196" stroke="#5a514a" stroke-width="1.3"/>
+        <rect x="336" y="352" width="232" height="48" fill="url(#hatch)" stroke="#4a423c" stroke-width="1.2"/>
+
+        <!-- mouth: lit in proportion to the trailing light value -->
+        <rect x="392" y="238" width="120" height="86" fill="#0e0b09" stroke="#5a514a" stroke-width="1.3"/>
+        <rect class="ember-core" x="404" y="252" width="96" height="60" fill="#d2702f" opacity=".86"/>
+        <g stroke="#0e0b09" stroke-width="2">
+          <line x1="404" y1="282" x2="500" y2="282"/>
+          <line x1="436" y1="252" x2="436" y2="312"/>
+          <line x1="468" y1="252" x2="468" y2="312"/>
+        </g>
+
+        <!-- ---------- bench ---------- -->
+        <line x1="150" y1="400" x2="762" y2="400" stroke="#5a514a" stroke-width="1.6"/>
+        <line x1="150" y1="408" x2="762" y2="408" stroke="#3c3531" stroke-width="1"/>
+        <g stroke="#4a423c" stroke-width="1.3">
+          <line x1="196" y1="408" x2="196" y2="474"/><line x1="716" y1="408" x2="716" y2="474"/>
+          <line x1="196" y1="452" x2="716" y2="452"/>
+        </g>
+        <line x1="120" y1="474" x2="792" y2="474" stroke="#2c2724" stroke-width="1"/>
+
+        <!-- ---------- bellows, unlocked component ---------- -->
+        <g stroke="#4a423c" stroke-width="1.3" fill="none">
+          <path d="M212 306 L296 284 L296 356 L212 334 Z"/>
+          <path d="M234 300 L234 340 M256 294 L256 346 M278 289 L278 351"/>
+          <line x1="296" y1="320" x2="336" y2="320"/>
+        </g>
+
+        <!-- ---------- rack of marks: one per 10 cumulative hours ---------- -->
+        <line x1="604" y1="256" x2="744" y2="256" stroke="#3c3531" stroke-width="1"/>
+        <g stroke="#7d97a6" stroke-width="1.6" opacity=".66">
+          <line x1="612" y1="256" x2="612" y2="318"/><line x1="624" y1="256" x2="624" y2="300"/>
+          <line x1="636" y1="256" x2="636" y2="330"/><line x1="648" y1="256" x2="648" y2="292"/>
+          <line x1="660" y1="256" x2="660" y2="322"/><line x1="672" y1="256" x2="672" y2="306"/>
+          <line x1="684" y1="256" x2="684" y2="338"/><line x1="696" y1="256" x2="696" y2="288"/>
+          <line x1="708" y1="256" x2="708" y2="314"/><line x1="720" y1="256" x2="720" y2="298"/>
+          <line x1="732" y1="256" x2="732" y2="326"/><line x1="744" y1="256" x2="744" y2="304"/>
+        </g>
+
+        <!-- ---------- dormant components, outline until threshold ---------- -->
+        <g stroke="#2c2724" stroke-width="1.2" fill="none" stroke-dasharray="3 5">
+          <path d="M604 356 L604 400 L744 400 L744 356 Z"/>
+          <path d="M212 196 L212 252 L296 252 L296 196 Z"/>
+        </g>
+
+        <!-- ---------- dimension lines ---------- -->
+        <g stroke="#3c3531" stroke-width="1">
+          <line x1="336" y1="496" x2="568" y2="496"/>
+          <path d="M332 490 L340 502 M572 490 L564 502"/>
+          <line x1="336" y1="410" x2="336" y2="496"/>
+          <line x1="568" y1="410" x2="568" y2="496"/>
+          <line x1="812" y1="172" x2="812" y2="400"/>
+          <path d="M806 176 L818 168 M806 396 L818 404"/>
+          <line x1="576" y1="172" x2="812" y2="172" stroke-dasharray="2 4"/>
+        </g>
+
+        <!-- ---------- callout leaders ---------- -->
+        <g stroke="#342d28" stroke-width="1" fill="none">
+          <path d="M254 284 L254 232 L196 232"/>
+          <path d="M674 256 L674 214 L748 214"/>
+        </g>
+
+        <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#8b827a" letter-spacing=".05em">
+          <text x="452" y="490" text-anchor="middle">FORGE 02</text>
+          <text x="826" y="290">213h</text>
+          <text x="190" y="228" text-anchor="end">BELLOWS</text>
+          <text x="754" y="218">MARKS 12</text>
+          <text x="604" y="422" fill="#4a423c">LOCKED 40h</text>
+          <text x="212" y="188" fill="#4a423c">LOCKED 12w</text>
+        </g>
+      </svg>
+
+      <div class="station-legend">
+        <span>Structures <b class="mono">2 of 6</b></span>
+        <span>Marks <b class="mono">12</b></span>
+        <span>Last cold <b class="mono">41 days ago</b></span>
+      </div>
+    </section>
+
+    <aside class="rail">
+      <div class="rail-block">
+        <h2>What are you working on</h2>
+        <input class="intent-field" type="text" value="Chapter 4 rewrite, second pass" aria-label="Session intention">
+        <div class="recent-row">
+          <button class="chip">Thesis reading</button>
+          <button class="chip">Inbox</button>
+          <button class="chip">Model tuning</button>
+        </div>
+        <div class="duration" role="group" aria-label="Session length">
+          <button aria-pressed="false">25m</button>
+          <button aria-pressed="true">50m</button>
+          <button aria-pressed="false">90m</button>
+          <button aria-pressed="false">Open</button>
+        </div>
+        <button class="begin">Begin</button>
+      </div>
+
+      <div class="log">
+        <h2>Recent</h2>
+        <div class="entry">
+          <span class="t mono">Today</span>
+          <span class="what">Chapter 4 rewrite<em>Finished</em></span>
+          <span class="d mono">50m</span>
+        </div>
+        <div class="entry partial">
+          <span class="t mono">Today</span>
+          <span class="what">Thesis reading<em>Cut short</em></span>
+          <span class="d mono">17m</span>
+        </div>
+        <div class="entry">
+          <span class="t mono">Mon</span>
+          <span class="what">Model tuning<em>Finished</em></span>
+          <span class="d mono">90m</span>
+        </div>
+        <div class="entry">
+          <span class="t mono">Mon</span>
+          <span class="what">Chapter 4 outline<em>Finished</em></span>
+          <span class="d mono">50m</span>
+        </div>
+        <div class="entry partial">
+          <span class="t mono">Sun</span>
+          <span class="what">Inbox<em>Abandoned</em></span>
+          <span class="d mono">4m</span>
+        </div>
+        <div class="entry">
+          <span class="t mono">Sat</span>
+          <span class="what">Thesis reading<em>Finished</em></span>
+          <span class="d mono">50m</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ===================== REVIEW VIEW ===================== -->
+  <main class="review hidden" id="view-review">
+    <div class="review-head">
+      <h1>Week of 8 September</h1>
+      <span class="range mono">8 Sep to 14 Sep</span>
+    </div>
+    <p class="review-sub">You declared eleven sessions and finished seven. The four that didn&rsquo;t finish all started after 21:00.</p>
+
+    <div class="finding">
+      <div>
+        <h3>Declared against completed</h3>
+        <p class="q">How much of what you planned actually happened.</p>
+        <div class="figure">
+          <span class="big mono">64</span><span class="unit">percent completed</span>
+        </div>
+        <svg class="chart" viewBox="0 0 420 150" role="img" aria-label="Declared and completed sessions by day. Mock data.">
+          <line class="axis-line" x1="30" y1="120" x2="410" y2="120"/>
+          <line class="grid-line" x1="30" y1="86"  x2="410" y2="86"/>
+          <line class="grid-line" x1="30" y1="52"  x2="410" y2="52"/>
+          <line class="grid-line" x1="30" y1="18"  x2="410" y2="18"/>
+          <text x="8" y="123">0</text><text x="8" y="55">2</text><text x="8" y="21">3</text>
+
+          <g fill="#3c3531">
+            <rect x="44"  y="52"  width="20" height="68"/><rect x="98"  y="86" width="20" height="34"/>
+            <rect x="152" y="18"  width="20" height="102"/><rect x="206" y="86" width="20" height="34"/>
+            <rect x="260" y="52"  width="20" height="68"/><rect x="314" y="86" width="20" height="34"/>
+            <rect x="368" y="120" width="20" height="0"/>
+          </g>
+          <g fill="#d2702f">
+            <rect x="44"  y="86"  width="20" height="34"/><rect x="98"  y="86" width="20" height="34"/>
+            <rect x="152" y="52"  width="20" height="68"/><rect x="206" y="120" width="20" height="0"/>
+            <rect x="260" y="52"  width="20" height="68"/><rect x="314" y="86" width="20" height="34"/>
+            <rect x="368" y="120" width="20" height="0"/>
+          </g>
+          <g>
+            <text x="48" y="136">MON</text><text x="102" y="136">TUE</text><text x="156" y="136">WED</text>
+            <text x="210" y="136">THU</text><text x="264" y="136">FRI</text><text x="318" y="136">SAT</text>
+            <text x="372" y="136">SUN</text>
+          </g>
+        </svg>
+      </div>
+
+      <div>
+        <h3>Shape of the day</h3>
+        <p class="q">When focus actually held, across all sessions this week.</p>
+        <div class="figure">
+          <span class="big mono">09:40</span><span class="unit">strongest hour</span>
+        </div>
+        <svg class="chart" viewBox="0 0 420 150" role="img" aria-label="Focus quality across hours of the day. Mock data.">
+          <line class="axis-line" x1="30" y1="120" x2="410" y2="120"/>
+          <line class="grid-line" x1="30" y1="80" x2="410" y2="80"/>
+          <line class="grid-line" x1="30" y1="40" x2="410" y2="40"/>
+          <path d="M36 112 L68 74 L100 40 L132 32 L164 58 L196 96 L228 88 L260 66 L292 78 L324 100 L356 114 L392 118"
+                fill="none" stroke="#7d97a6" stroke-width="1.6"/>
+          <path d="M36 112 L68 74 L100 40 L132 32 L164 58 L196 96 L228 88 L260 66 L292 78 L324 100 L356 114 L392 118 L392 120 L36 120 Z"
+                fill="#7d97a6" opacity=".07"/>
+          <circle cx="132" cy="32" r="3.5" fill="#d2702f"/>
+          <g>
+            <text x="30" y="136">07</text><text x="124" y="136">10</text>
+            <text x="220" y="136">14</text><text x="316" y="136">18</text><text x="386" y="136">22</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <h3>Trailing twelve weeks</h3>
+        <p class="q">Whether this is holding up across months.</p>
+        <div class="figure">
+          <span class="big mono">6.2</span><span class="unit">hours, up from 4.8</span>
+        </div>
+        <svg class="chart" viewBox="0 0 420 150" role="img" aria-label="Weekly hours over twelve weeks. Mock data.">
+          <line class="axis-line" x1="30" y1="120" x2="410" y2="120"/>
+          <line class="grid-line" x1="30" y1="80" x2="410" y2="80"/>
+          <line class="grid-line" x1="30" y1="40" x2="410" y2="40"/>
+          <text x="8" y="83">4</text><text x="8" y="43">8</text>
+          <polyline points="38,96 70,84 102,104 134,72 166,118 198,110 230,88 262,64 294,92 326,58 358,70 390,62"
+                    fill="none" stroke="#d2702f" stroke-width="1.8"/>
+          <g fill="#131110" stroke="#d2702f" stroke-width="1.4">
+            <circle cx="166" cy="118" r="3"/><circle cx="390" cy="62" r="3"/>
+          </g>
+          <text x="146" y="138">WEEK 5</text><text x="364" y="138">NOW</text>
+        </svg>
+      </div>
+
+      <div>
+        <h3>Where the time went</h3>
+        <p class="q">What you actually spent the week on.</p>
+        <div class="figure">
+          <span class="big mono">3</span><span class="unit">threads, one of them most of it</span>
+        </div>
+        <svg class="chart" viewBox="0 0 420 150" role="img" aria-label="Hours by thread. Mock data.">
+          <g fill="#d2702f"><rect x="120" y="22" width="212" height="16"/></g>
+          <g fill="#7d97a6" opacity=".8"><rect x="120" y="58" width="96" height="16"/></g>
+          <g fill="#4a423c"><rect x="120" y="94" width="52" height="16"/></g>
+          <g text-anchor="end" fill="#9a9188">
+            <text x="108" y="34">CHAPTER 4</text>
+            <text x="108" y="70">THESIS READING</text>
+            <text x="108" y="106">MODEL TUNING</text>
+          </g>
+          <g fill="#8b827a">
+            <text x="342" y="34">3h 20m</text><text x="226" y="70">1h 30m</text><text x="182" y="106">50m</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="recommendation">
+      <h3>One thing</h3>
+      <p>Stop starting sessions after 21:00. Every one you abandoned this week began after that hour.</p>
+      <p class="why">Four of your eleven declared sessions started late in the evening, and none of the four finished. Your strongest hour is 09:40, and you declared nothing in that window on three days.</p>
+    </div>
+  </main>
+
+  <footer class="strip">
+    <span class="k">Last 14 days</span>
+    <div class="bars" role="img" aria-label="Daily focus minutes over the last fourteen days. Mock data.">
+      <div class="bar" style="height:38%"></div><div class="bar zero" style="height:6%"></div>
+      <div class="bar" style="height:52%"></div><div class="bar hi" style="height:88%"></div>
+      <div class="bar" style="height:30%"></div><div class="bar zero" style="height:6%"></div>
+      <div class="bar zero" style="height:6%"></div><div class="bar" style="height:46%"></div>
+      <div class="bar hi" style="height:74%"></div><div class="bar" style="height:22%"></div>
+      <div class="bar" style="height:58%"></div><div class="bar zero" style="height:6%"></div>
+      <div class="bar" style="height:40%"></div><div class="bar hi" style="height:92%"></div>
+    </div>
+    <span class="tail mono">9 of 14 days worked</span>
+  </footer>
+
+</div>
+
+<script>
+  const bm = document.getElementById('btn-main');
+  const br = document.getElementById('btn-review');
+  const vm = document.getElementById('view-main');
+  const vr = document.getElementById('view-review');
+
+  function show(which){
+    const main = which === 'main';
+    vm.classList.toggle('hidden', !main);
+    vr.classList.toggle('hidden', main);
+    bm.setAttribute('aria-pressed', String(main));
+    br.setAttribute('aria-pressed', String(!main));
+  }
+  bm.addEventListener('click', () => show('main'));
+  br.addEventListener('click', () => show('review'));
+
+  document.querySelectorAll('.duration').forEach(group => {
+    group.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      group.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+    });
+  });
+</script>
+</body>
+</html>

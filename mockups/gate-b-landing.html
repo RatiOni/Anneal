@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gate B landing page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   GATE B LANDING PAGE. Static mockup.
+   Purpose: state the product and the real price, capture email.
+   Theme locked dark. One accent (ember). Radius 0 throughout.
+   No testimonials, no logo wall, no user counts: none exist yet,
+   and fabricating them is banned by the marketing plan's honesty rules.
+   ============================================================ */
+
+:root{
+  --ground:#131110; --surface:#1a1715; --surface-2:#211d1a;
+  --line:#2c2724; --line-bright:#3c3531;
+  --text:#e9e2d9; --text-2:#9a9188; --text-3:#8b827a;
+  --ember:#d2702f; --steel:#7d97a6;
+  --measure:64ch;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ground);color:var(--text);
+  font-family:'Archivo',system-ui,sans-serif;font-size:16px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+/* ---------- nav ---------- */
+nav{
+  position:sticky;top:0;z-index:20;height:68px;
+  display:flex;align-items:center;
+  background:rgba(19,17,16,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+nav .wrap{display:flex;align-items:center;width:100%}
+.wordmark{font-weight:700;font-size:15px;letter-spacing:.15em;text-transform:uppercase}
+.wordmark span{color:var(--ember)}
+.nav-cta{
+  margin-left:auto;border:1px solid var(--line-bright);
+  padding:9px 18px;font-size:14px;color:var(--text);
+  text-decoration:none;transition:border-color .2s ease,background-color .2s ease;
+}
+.nav-cta:hover{border-color:var(--ember);background:var(--surface-2)}
+
+/* ---------- hero: asymmetric split ---------- */
+.hero{padding-top:84px;padding-bottom:96px}
+.hero .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.hero h1{
+  font-size:clamp(38px,5vw,62px);font-weight:700;
+  letter-spacing:-.03em;line-height:1.04;
+}
+.hero p.lede{
+  font-size:19px;color:var(--text-2);line-height:1.6;
+  max-width:46ch;margin-top:22px;
+}
+.hero-cta{
+  display:inline-block;margin-top:32px;
+  background:var(--ember);color:#140d07;
+  padding:15px 34px;font-weight:600;font-size:15px;
+  letter-spacing:.07em;text-transform:uppercase;text-decoration:none;
+  transition:background-color .2s ease,transform .12s ease;
+}
+.hero-cta:hover{background:#e07c38}
+.hero-cta:active{transform:translateY(1px)}
+.hero-cta:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+
+.hero-art{
+  position:relative;aspect-ratio:5/4;
+  border:1px solid var(--line);background:
+    radial-gradient(120% 80% at 50% 66%, rgba(210,112,47,.14), transparent 60%),
+    var(--surface);
+}
+.hero-art svg{position:absolute;inset:0;width:100%;height:100%}
+
+/* ---------- editorial statement, full width ---------- */
+.statement{border-top:1px solid var(--line);padding:96px 0}
+.statement p{
+  font-size:clamp(24px,2.8vw,36px);font-weight:500;
+  line-height:1.36;letter-spacing:-.02em;max-width:30ch;
+}
+.statement p + p{margin-top:26px;color:var(--text-2);font-size:19px;font-weight:400;max-width:58ch;letter-spacing:0}
+
+/* ---------- split with product render ---------- */
+.shows{border-top:1px solid var(--line);padding:96px 0}
+.shows .wrap{display:grid;grid-template-columns:0.85fr 1.15fr;gap:56px;align-items:center}
+.shows h2{font-size:clamp(26px,3vw,38px);font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.shows p{color:var(--text-2);margin-top:18px;max-width:44ch;line-height:1.65}
+.panel{border:1px solid var(--line);background:var(--surface);padding:26px 28px 22px}
+.panel .lbl{font-size:11px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase}
+.panel .fig{display:flex;align-items:baseline;gap:10px;margin:10px 0 18px}
+.panel .fig b{font-size:46px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.panel .fig span{color:var(--text-2);font-size:15px}
+.panel .verdict{
+  margin-top:20px;border-left:2px solid var(--ember);
+  padding:2px 0 2px 16px;font-size:17px;font-weight:500;line-height:1.45;
+}
+.panel svg text{font-family:'IBM Plex Mono',monospace;font-size:9.5px;fill:var(--text-3)}
+
+/* ---------- refusals: grouped two-column list ---------- */
+.refuses{border-top:1px solid var(--line);padding:96px 0}
+.refuses h2{font-size:clamp(26px,3vw,38px);font-weight:600;letter-spacing:-.02em;max-width:24ch}
+.refuses .grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  column-gap:56px;margin-top:44px;
+}
+.ref{padding:22px 0;border-top:1px solid var(--line)}
+.ref b{display:block;font-size:17px;font-weight:600;margin-bottom:6px}
+.ref span{color:var(--text-2);font-size:15px;line-height:1.6;display:block;max-width:42ch}
+
+/* ---------- local: full width statement plus spec ---------- */
+.local{border-top:1px solid var(--line);padding:96px 0}
+.local .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:start}
+.local h2{font-size:clamp(26px,3vw,38px);font-weight:600;letter-spacing:-.02em;line-height:1.2;max-width:22ch}
+.local p{color:var(--text-2);margin-top:18px;max-width:48ch;line-height:1.65}
+.spec{border:1px solid var(--line);background:var(--surface)}
+.spec div{display:flex;justify-content:space-between;gap:20px;padding:15px 20px;font-size:14px}
+.spec div + div{border-top:1px solid var(--line)}
+.spec div span:first-child{color:var(--text-3)}
+.spec div span:last-child{color:var(--text)}
+
+/* ---------- price ---------- */
+.price{border-top:1px solid var(--line);padding:96px 0}
+.price h2{font-size:clamp(26px,3vw,38px);font-weight:600;letter-spacing:-.02em}
+.price .why{color:var(--text-2);margin-top:16px;max-width:56ch;line-height:1.65}
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:44px;border:1px solid var(--line-bright)}
+.tier{padding:32px 30px 34px}
+.tier + .tier{border-left:1px solid var(--line-bright);background:var(--surface)}
+.tier .name{font-size:12px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase}
+.tier .amount{display:flex;align-items:baseline;gap:9px;margin:14px 0 4px}
+.tier .amount b{font-size:44px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.tier .amount i{font-style:normal;color:var(--text-2);font-size:15px}
+.tier .alt{color:var(--text-3);font-size:14px}
+.tier ul{list-style:none;margin-top:24px}
+.tier li{padding:11px 0;border-top:1px solid var(--line);font-size:15px;color:var(--text-2);line-height:1.5}
+.tier li b{color:var(--text);font-weight:500}
+
+/* ---------- capture form ---------- */
+.capture{border-top:1px solid var(--line);padding:96px 0 104px}
+.capture h2{font-size:clamp(26px,3vw,38px);font-weight:600;letter-spacing:-.02em;max-width:26ch}
+.capture p{color:var(--text-2);margin-top:16px;max-width:52ch;line-height:1.65}
+form{margin-top:34px;max-width:560px}
+label{display:block;font-size:13px;color:var(--text-2);margin-bottom:8px}
+.field-row{display:flex;gap:0;border:1px solid var(--line-bright)}
+input[type=email]{
+  flex:1;background:var(--surface);border:none;
+  padding:16px 18px;font:inherit;font-size:16px;color:var(--text);
+}
+input[type=email]::placeholder{color:var(--text-3)}
+input[type=email]:focus{outline:2px solid var(--ember);outline-offset:-2px}
+.field-row button{
+  background:var(--ember);color:#140d07;border:none;cursor:pointer;
+  padding:0 30px;font:inherit;font-weight:600;font-size:14px;
+  letter-spacing:.07em;text-transform:uppercase;
+  transition:background-color .2s ease;
+}
+.field-row button:hover{background:#e07c38}
+.field-row button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.helper{font-size:13px;color:var(--text-3);margin-top:12px;line-height:1.6}
+.sent{display:none;margin-top:22px;border-left:2px solid var(--ember);padding-left:16px;font-size:16px}
+.sent.on{display:block}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:36px 0;background:var(--surface)}
+footer .wrap{display:flex;gap:26px;align-items:center;font-size:13px;color:var(--text-3);flex-wrap:wrap}
+footer a{color:var(--text-2);text-decoration:none}
+footer a:hover{color:var(--text)}
+footer .end{margin-left:auto}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{animation:none !important;transition:none !important}
+}
+@media (max-width:900px){
+  .hero{padding-top:56px;padding-bottom:64px}
+  .hero .wrap,.shows .wrap,.local .wrap{grid-template-columns:1fr;gap:40px}
+  .refuses .grid,.tiers{grid-template-columns:1fr}
+  .tier + .tier{border-left:none;border-top:1px solid var(--line-bright)}
+  .statement,.shows,.refuses,.local,.price{padding:64px 0}
+  .field-row{flex-direction:column}
+  .field-row button{padding:16px 0}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="wordmark">Ann<span>eal</span></div>
+    <a class="nav-cta" href="#notify">Get notified</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Nothing here congratulates you.</h1>
+      <p class="lede">A focus tracker for adults. It counts the time you actually sat down, then compares it to what you planned.</p>
+      <a class="hero-cta" href="#notify">Get notified</a>
+    </div>
+
+    <!-- Real product render, not a mocked-up screenshot. This is the same
+         data-driven station drawing the application ships. -->
+    <div class="hero-art">
+      <svg viewBox="0 0 700 560" preserveAspectRatio="xMidYMid meet" aria-label="The station: a technical drawing of a forge that accumulates parts as hours accumulate.">
+        <defs>
+          <pattern id="h2" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#342d28" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <g stroke="#4a423c" stroke-width="1.3" fill="none">
+          <line x1="322" y1="216" x2="322" y2="78"/><line x1="358" y1="216" x2="358" y2="78"/>
+          <line x1="314" y1="142" x2="366" y2="142"/><line x1="314" y1="146" x2="366" y2="146"/>
+          <line x1="314" y1="98"  x2="366" y2="98"/><line x1="314" y1="102" x2="366" y2="102"/>
+        </g>
+        <path d="M228 216 L250 194 L430 194 L452 216 L452 408 L228 408 Z" fill="#161312" stroke="#5a514a" stroke-width="1.5"/>
+        <line x1="228" y1="216" x2="452" y2="216" stroke="#5a514a" stroke-width="1.3"/>
+        <rect x="228" y="362" width="224" height="46" fill="url(#h2)" stroke="#4a423c" stroke-width="1.2"/>
+        <rect x="282" y="254" width="116" height="84" fill="#0e0b09" stroke="#5a514a" stroke-width="1.3"/>
+        <rect x="294" y="268" width="92" height="58" fill="#d2702f" opacity=".86"/>
+        <g stroke="#0e0b09" stroke-width="2">
+          <line x1="294" y1="297" x2="386" y2="297"/>
+          <line x1="325" y1="268" x2="325" y2="326"/><line x1="356" y1="268" x2="356" y2="326"/>
+        </g>
+        <line x1="72" y1="408" x2="628" y2="408" stroke="#5a514a" stroke-width="1.6"/>
+        <line x1="72" y1="416" x2="628" y2="416" stroke="#3c3531" stroke-width="1"/>
+        <g stroke="#4a423c" stroke-width="1.3">
+          <line x1="116" y1="416" x2="116" y2="474"/><line x1="584" y1="416" x2="584" y2="474"/>
+          <line x1="116" y1="456" x2="584" y2="456"/>
+        </g>
+        <g stroke="#4a423c" stroke-width="1.3" fill="none">
+          <path d="M118 318 L196 298 L196 362 L118 342 Z"/>
+          <path d="M138 312 L138 348 M158 306 L158 354 M178 301 L178 359"/>
+          <line x1="196" y1="330" x2="228" y2="330"/>
+        </g>
+        <line x1="486" y1="270" x2="606" y2="270" stroke="#3c3531" stroke-width="1"/>
+        <g stroke="#7d97a6" stroke-width="1.6" opacity=".66">
+          <line x1="494" y1="270" x2="494" y2="326"/><line x1="506" y1="270" x2="506" y2="310"/>
+          <line x1="518" y1="270" x2="518" y2="338"/><line x1="530" y1="270" x2="530" y2="302"/>
+          <line x1="542" y1="270" x2="542" y2="330"/><line x1="554" y1="270" x2="554" y2="314"/>
+          <line x1="566" y1="270" x2="566" y2="344"/><line x1="578" y1="270" x2="578" y2="298"/>
+          <line x1="590" y1="270" x2="590" y2="322"/><line x1="602" y1="270" x2="602" y2="308"/>
+        </g>
+        <g stroke="#2c2724" stroke-width="1.2" fill="none" stroke-dasharray="3 5">
+          <path d="M486 366 L486 408 L606 408 L606 366 Z"/>
+        </g>
+        <g stroke="#3c3531" stroke-width="1">
+          <line x1="228" y1="500" x2="452" y2="500"/>
+          <path d="M224 494 L232 506 M456 494 L448 506"/>
+          <line x1="228" y1="418" x2="228" y2="500"/><line x1="452" y1="418" x2="452" y2="500"/>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#8b827a" letter-spacing=".05em">
+          <text x="340" y="494" text-anchor="middle">FORGE 02</text>
+          <text x="486" y="362" fill="#4a423c">LOCKED 40h</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<section class="statement">
+  <div class="wrap">
+    <p>You already know you got less done than you meant to. You probably can&rsquo;t say how much less.</p>
+    <p>Habitica, Finch and the rest ask you to tick a box, then congratulate you for ticking it. You can tick a box in half a second from bed. This one runs a timer, so the only way to move the number is to sit there.</p>
+  </div>
+</section>
+
+<section class="shows">
+  <div class="wrap">
+    <div>
+      <h2>Once a week it tells you one thing</h2>
+      <p>Once a week it lines up what you said you&rsquo;d do against what the timer actually recorded, then gives you one thing to change. Only one. You&rsquo;d ignore a list of nine.</p>
+    </div>
+
+    <div class="panel">
+      <div class="lbl">Declared against completed</div>
+      <div class="fig"><b class="mono">64</b><span>percent completed</span></div>
+      <svg viewBox="0 0 420 132" role="img" aria-label="Declared and completed sessions by day. Example data.">
+        <line x1="30" y1="104" x2="410" y2="104" stroke="#3c3531" stroke-width="1"/>
+        <line x1="30" y1="72" x2="410" y2="72" stroke="#2c2724" stroke-width="1"/>
+        <line x1="30" y1="40" x2="410" y2="40" stroke="#2c2724" stroke-width="1"/>
+        <g fill="#3c3531">
+          <rect x="44" y="40" width="20" height="64"/><rect x="98" y="72" width="20" height="32"/>
+          <rect x="152" y="14" width="20" height="90"/><rect x="206" y="72" width="20" height="32"/>
+          <rect x="260" y="40" width="20" height="64"/><rect x="314" y="72" width="20" height="32"/>
+        </g>
+        <g fill="#d2702f">
+          <rect x="44" y="72" width="20" height="32"/><rect x="98" y="72" width="20" height="32"/>
+          <rect x="152" y="40" width="20" height="64"/>
+          <rect x="260" y="40" width="20" height="64"/><rect x="314" y="72" width="20" height="32"/>
+        </g>
+        <g><text x="48" y="120">MON</text><text x="102" y="120">TUE</text><text x="156" y="120">WED</text>
+           <text x="210" y="120">THU</text><text x="264" y="120">FRI</text><text x="318" y="120">SAT</text>
+           <text x="372" y="120">SUN</text></g>
+      </svg>
+      <div class="verdict">Stop starting sessions after 21:00. Every one you abandoned this week began after that hour.</div>
+    </div>
+  </div>
+</section>
+
+<section class="refuses">
+  <div class="wrap">
+    <h2>Six things it won&rsquo;t do</h2>
+    <div class="grid">
+      <div class="ref">
+        <b>Punish you for a bad week</b>
+        <span>Skip a week and the forge goes dark. Nothing gets deleted. Come back in March and every mark you earned is still on the rack.</span>
+      </div>
+      <div class="ref">
+        <b>Assume every day looks the same</b>
+        <span>Commitments are counted by the week. Four sessions in seven days, whichever seven days those are. Night shifts and flu don&rsquo;t break anything.</span>
+      </div>
+      <div class="ref">
+        <b>Hand you eleven systems on day one</b>
+        <span>Week one is a timer and nothing else. Habitica opens with dailies, habits, to-dos, gold, health and a party, which is why people bounce off it.</span>
+      </div>
+      <div class="ref">
+        <b>Let you game your own score</b>
+        <span>The number is minutes on a clock. You can pad a to-do list with &ldquo;drink water&rdquo;. You can&rsquo;t pad a timer.</span>
+      </div>
+      <div class="ref">
+        <b>Make you tend a rotting list</b>
+        <span>Anything you stop touching files itself away. You won&rsquo;t come back after two months off and face forty stale items.</span>
+      </div>
+      <div class="ref">
+        <b>Nag you</b>
+        <span>There&rsquo;s no streak counter, no notifications, and no email three weeks later asking whether you&rsquo;ve given up on yourself.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="local">
+  <div class="wrap">
+    <div>
+      <h2>Your record never leaves your machine</h2>
+      <p>There&rsquo;s no account and no server. Your history is a SQLite file in your AppData folder. Open it, copy it to a USB stick, delete it. If I stop working on this, you still have the file.</p>
+      <p>Syncing between machines is the one part that costs me money every month. That&rsquo;s the part I charge for.</p>
+    </div>
+    <div class="spec">
+      <div><span>Storage</span><span class="mono">Local SQLite file</span></div>
+      <div><span>Account required</span><span class="mono">No</span></div>
+      <div><span>Works offline</span><span class="mono">Always</span></div>
+      <div><span>Telemetry</span><span class="mono">Opt-in only</span></div>
+      <div><span>Export</span><span class="mono">It&rsquo;s already a file</span></div>
+      <div><span>Platform</span><span class="mono">Windows first</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="price">
+  <div class="wrap">
+    <h2>You pay for the parts that cost me money</h2>
+    <p class="why">Anything that costs me nothing to hand you is free and stays free. The subscription covers server bills for sync, and the months of work behind each new domain after focus.</p>
+
+    <div class="tiers">
+      <div class="tier">
+        <div class="name">Free, no account</div>
+        <div class="amount"><b class="mono">$0</b><i>forever</i></div>
+        <div class="alt">The whole app. No time limit.</div>
+        <ul>
+          <li>The <b>full daily loop</b> and timer</li>
+          <li>The <b>station</b> and everything it accumulates</li>
+          <li>The <b>weekly review</b> for focus</li>
+          <li><b>Unlimited history</b>, stored locally</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <div class="name">Subscription</div>
+        <div class="amount"><b class="mono">$9</b><i>every four weeks</i></div>
+        <div class="alt">Or <span class="mono">$79</span> a year. You cancel inside the app, in two clicks.</div>
+        <ul>
+          <li><b>Sync and backup</b> across your machines</li>
+          <li><b>New domains</b> beyond focus as they ship</li>
+          <li><b>Deeper review</b>, longer trailing windows</li>
+          <li>A <b>permanently lower rate</b> once you pass four months</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="capture" id="notify">
+  <div class="wrap">
+    <h2>It isn&rsquo;t built yet</h2>
+    <p>I&rsquo;m building it on Windows first. Leave an address and I&rsquo;ll write to you once, when there&rsquo;s something you can actually run.</p>
+
+    <form id="notify-form" novalidate>
+      <label for="email">Email address</label>
+      <div class="field-row">
+        <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+        <button type="submit">Get notified</button>
+      </div>
+      <p class="helper">One email when it ships. No newsletter, no sequence, and I won&rsquo;t hand your address to anyone.</p>
+      <p class="sent" id="sent">Got it. One email, when it&rsquo;s ready.</p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="#notify">Get notified</a>
+    <span class="end mono">Static mockup. The prices are proposals and nothing here is live yet.</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('notify-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var f = document.getElementById('email');
+    if (!f.value || !f.checkValidity()) { f.focus(); return; }
+    document.getElementById('sent').classList.add('on');
+    f.value = '';
+  });
+</script>
+</body>
+</html>

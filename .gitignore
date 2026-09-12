@@ -1,0 +1,6 @@
+node_modules/
+target/
+dist/
+
+# Strategy documents. Deliberately not published: see PLAN.md section 8.
+private/
