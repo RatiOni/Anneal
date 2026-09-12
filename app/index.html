@@ -13,6 +13,10 @@
     <div class="app">
       <header class="topbar">
         <div class="wordmark">Ann<span>eal</span></div>
+        <div class="viewswitch" role="group" aria-label="View">
+          <button id="view-station" type="button" aria-pressed="true">Station</button>
+          <button id="view-review" type="button" aria-pressed="false">Review</button>
+        </div>
         <div class="readouts">
           <div class="readout">
             <span class="k">Last 14 days</span><span class="v mono" data-field="week">0h 0m</span>
@@ -180,6 +184,17 @@
               <button id="cut_short" type="button">Cut short</button>
               <button id="abandoned" type="button">Abandoned</button>
             </div>
+
+            <!-- Asked after the session is already recorded, so ignoring it
+                 costs nothing and never blocks getting back to work. -->
+            <div id="fidelity" class="fidelity" hidden>
+              <p class="fidelity-q">Did that go to what you declared?</p>
+              <div class="fidelity-row" role="group" aria-label="Did it go to what you declared">
+                <button type="button" data-fidelity="yes">Yes</button>
+                <button type="button" data-fidelity="partly">Partly</button>
+                <button type="button" data-fidelity="no">No</button>
+              </div>
+            </div>
           </div>
 
           <div class="log">
@@ -188,6 +203,8 @@
           </div>
         </aside>
       </main>
+
+      <main class="review" id="review" hidden aria-label="Weekly review"></main>
     </div>
 
     <script type="module" src="/src/main.ts"></script>

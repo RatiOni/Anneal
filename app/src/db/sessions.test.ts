@@ -20,6 +20,8 @@ import {
   listSessions,
   sessionsForEngine,
   MAX_INTENTION_LENGTH,
+  setFidelity,
+  sessionsForReview,
   type Db,
 } from './sessions.ts';
 
@@ -279,7 +281,96 @@ async function main() {
     assert.equal(forEngine[0].end! - forEngine[0].start, 50 * MIN);
   }
 
-  console.log('sessions.test.ts: all checks passed');
+
 }
 
 await main();
+
+  // --- the fidelity column, added by migration to an existing table -------
+  {
+    const { db, sqlite } = freshDb();
+
+    // Build the table WITHOUT the new column, exactly as an installed v0.1.0
+    // has it on disk, then let migrate() bring it forward.
+    sqlite.exec(`CREATE TABLE sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, intention TEXT NOT NULL,
+      planned_minutes INTEGER, started_at INTEGER NOT NULL,
+      last_seen_at INTEGER NOT NULL, ended_at INTEGER, outcome TEXT)`);
+    sqlite.prepare(
+      `INSERT INTO sessions (intention, started_at, last_seen_at, ended_at, outcome)
+       VALUES (?,?,?,?,?)`,
+    ).run('existing work', T0, T0, T0 + 50 * MIN, 'finished');
+
+    await migrate(db);
+    await migrate(db); // runs on every launch; must not add the column twice
+
+    const cols = await db.select<{ name: string }>(`PRAGMA table_info(sessions)`);
+    assert.equal(
+      cols.filter((c) => c.name === 'did_declared').length,
+      1,
+      'the column is added exactly once',
+    );
+
+    const rows = await listSessions(db);
+    assert.equal(rows.length, 1, 'the existing row survived the migration');
+    assert.equal(rows[0].intention, 'existing work');
+    assert.equal(rows[0].did_declared, null, 'and reads as unanswered, not as "no"');
+  }
+
+  // --- answering it -------------------------------------------------------
+  {
+    const { db } = freshDb();
+    await migrate(db);
+    const id = await startSession(db, { intention: 'Chapter 4' }, T0);
+    await endSession(db, id, 'finished', T0 + 50 * MIN);
+
+    assert.equal((await listSessions(db))[0].did_declared, null, 'unanswered by default');
+    await setFidelity(db, id, 'partly');
+    assert.equal((await listSessions(db))[0].did_declared, 'partly');
+    await setFidelity(db, id, 'no');
+    assert.equal((await listSessions(db))[0].did_declared, 'no', 'answers can be corrected');
+
+    await assert.rejects(() => setFidelity(db, id, 'maybe' as never), /Unknown answer/);
+    await assert.rejects(() => setFidelity(db, 999, 'yes'), /not finished/);
+  }
+
+  // --- a running session cannot be answered yet ---------------------------
+  {
+    const { db } = freshDb();
+    await migrate(db);
+    const id = await startSession(db, { intention: 'Still going' }, T0);
+    await assert.rejects(() => setFidelity(db, id, 'yes'), /not finished/);
+  }
+
+  // --- the schema refuses a value the code would not produce --------------
+  {
+    const { db, sqlite } = freshDb();
+    await migrate(db);
+    const id = await startSession(db, { intention: 'x' }, T0);
+    await endSession(db, id, 'finished', T0 + MIN);
+    assert.throws(
+      () => sqlite.prepare(`UPDATE sessions SET did_declared = ? WHERE id = ?`).run('sortof', id),
+      /constraint/i,
+      'the CHECK survives ALTER TABLE ADD COLUMN',
+    );
+  }
+
+  // --- what the review reads ----------------------------------------------
+  {
+    const { db } = freshDb();
+    await migrate(db);
+    const a = await startSession(db, { intention: 'first' }, T0);
+    await endSession(db, a, 'finished', T0 + 50 * MIN);
+    await setFidelity(db, a, 'yes');
+    const b = await startSession(db, { intention: 'second' }, T0 + 60 * MIN);
+    await endSession(db, b, 'cut_short', T0 + 70 * MIN);
+    await startSession(db, { intention: 'open' }, T0 + 80 * MIN);
+
+    const rows = await sessionsForReview(db);
+    assert.equal(rows.length, 2, 'open sessions are excluded');
+    assert.deepEqual(rows.map((r) => r.intention), ['first', 'second'], 'oldest first');
+    assert.equal(rows[0].did_declared, 'yes');
+    assert.equal(rows[1].did_declared, null);
+  }
+
+  console.log('sessions.test.ts: all checks passed');

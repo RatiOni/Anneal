@@ -20,9 +20,12 @@ import {
   findOpenSession,
   listSessions,
   sessionsForEngine,
+  sessionsForReview,
+  setFidelity,
   HEARTBEAT_MS,
   type Db,
   type Outcome,
+  type Fidelity,
   type SessionRow,
 } from './db/sessions.ts';
 import {
@@ -37,6 +40,8 @@ import { runOnboarding } from './onboarding/screen.ts';
 import { stationState } from './engine/station.ts';
 import { stationView, formatDuration, formatTotal } from './station/view.ts';
 import { renderStation, playResponse } from './station/render.ts';
+import { buildReview } from './review/review.ts';
+import { renderReview } from './review/screen.ts';
 
 // Verified location: AppData\Roaming\<identifier>\. See docs/allowed-apis.md s.3.
 const DB_URL = 'sqlite:sessions.db';
@@ -45,6 +50,8 @@ let db: Db;
 let openId: number | null = null;
 let plannedMinutes = 50;
 let heartbeat: ReturnType<typeof setInterval> | null = null;
+/** The session the fidelity question is currently about, if any. */
+let awaitingFidelity: number | null = null;
 
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const now = () => Date.now();
@@ -161,6 +168,8 @@ async function begin() {
 
 async function finish(outcome: Outcome) {
   if (openId === null) return;
+  const ended = openId;
+  hideFidelity();
   try {
     await endSession(db, openId, outcome, now());
     stopHeartbeat();
@@ -169,6 +178,7 @@ async function finish(outcome: Outcome) {
     // After the state is on screen, not before, so the animation lands on the
     // new values rather than the old ones.
     playResponse(station());
+    askFidelity(ended);
     return;
   } catch (error) {
     say(error instanceof Error ? error.message : String(error), true);
@@ -192,6 +202,45 @@ function selectDuration(minutes: number) {
   }
   for (const other of group.querySelectorAll('button')) other.removeAttribute('aria-pressed');
   match.setAttribute('aria-pressed', 'true');
+}
+
+function askFidelity(id: number) {
+  awaitingFidelity = id;
+  el('fidelity').hidden = false;
+}
+
+function hideFidelity() {
+  awaitingFidelity = null;
+  el('fidelity').hidden = true;
+}
+
+function wireFidelity() {
+  const group = document.querySelector('.fidelity-row');
+  if (!group) return;
+  group.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-fidelity]');
+    if (!button || awaitingFidelity === null) return;
+    const id = awaitingFidelity;
+    hideFidelity();
+    // Recording the answer must never block or undo the session that already
+    // ended, so a failure here is reported and nothing else changes.
+    setFidelity(db, id, button.dataset.fidelity as Fidelity)
+      .then(() => render())
+      .catch((error) => say(error instanceof Error ? error.message : String(error), true));
+  });
+}
+
+function showView(which: 'station' | 'review') {
+  const station = which === 'station';
+  el('station').hidden = !station;
+  el('review').hidden = station;
+  el('view-station').setAttribute('aria-pressed', String(station));
+  el('view-review').setAttribute('aria-pressed', String(!station));
+  if (!station) void refreshReview();
+}
+
+async function refreshReview() {
+  renderReview(el('review'), buildReview(await sessionsForReview(db), now()));
 }
 
 function wireDurations() {
@@ -229,6 +278,9 @@ async function boot() {
     if ((event as KeyboardEvent).key === 'Enter') void begin();
   });
   wireDurations();
+  wireFidelity();
+  el('view-station').addEventListener('click', () => showView('station'));
+  el('view-review').addEventListener('click', () => showView('review'));
 
   // Anything a crash left open is closed at its last heartbeat and named out
   // loud. A session that vanishes silently is the worst failure this app has.

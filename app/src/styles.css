@@ -622,3 +622,212 @@ button:disabled {
   outline: 2px solid var(--ember-colour);
   outline-offset: 2px;
 }
+
+/* ---------- view switcher ---------- */
+.viewswitch {
+  display: flex;
+  border: 1px solid var(--line-bright);
+}
+.viewswitch button {
+  padding: 6px 16px;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+.viewswitch button + button {
+  border-left: 1px solid var(--line-bright);
+}
+.viewswitch button[aria-pressed='true'] {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.viewswitch button:focus-visible {
+  outline: 2px solid var(--ember-colour);
+  outline-offset: -2px;
+}
+
+/* ---------- the fidelity question ---------- */
+.fidelity {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.fidelity-q {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  margin-bottom: 10px;
+}
+.fidelity-row {
+  display: flex;
+  gap: 8px;
+}
+.fidelity-row button {
+  flex: 1;
+  border: 1px solid var(--line-bright);
+  padding: 8px 0;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  transition:
+    border-color 200ms ease,
+    color 200ms ease;
+}
+.fidelity-row button:hover {
+  border-color: var(--text-3);
+  color: var(--text);
+}
+.fidelity-row button:focus-visible {
+  outline: 2px solid var(--ember-colour);
+  outline-offset: -2px;
+}
+
+/* ---------- weekly review ---------- */
+.review {
+  overflow: auto;
+  padding: 30px 34px 44px;
+  background: var(--ground);
+}
+.rv-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.rv-head h1 {
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.rv-range {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+.rv-sub {
+  font-size: var(--fs-base);
+  color: var(--text-2);
+  max-width: 68ch;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+.rv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 30px;
+  border-top: 1px solid var(--line);
+}
+.rv-panel {
+  padding: 26px 28px 26px 0;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+.rv-panel:nth-child(even) {
+  padding-left: 28px;
+  border-left: 1px solid var(--line);
+}
+.rv-label {
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.rv-question {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.rv-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 16px 0 14px;
+}
+.rv-figure b {
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.rv-figure span {
+  font-size: var(--fs-base);
+  color: var(--text-2);
+}
+
+/* Charts read as instruments: thin strokes, real labels, no fills. */
+.chart {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.chart .grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.chart .axis {
+  stroke: var(--line-bright);
+  stroke-width: 1;
+}
+.chart .tick {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  fill: var(--text-3);
+  letter-spacing: 0.05em;
+}
+.chart .bar-declared {
+  fill: var(--line-bright);
+}
+.chart .bar-completed {
+  fill: var(--ember-colour);
+}
+.chart .line-steel {
+  fill: none;
+  stroke: var(--steel);
+  stroke-width: 1.6;
+}
+.chart .line-ember {
+  fill: none;
+  stroke: var(--ember-colour);
+  stroke-width: 1.8;
+}
+
+.rv-rec {
+  margin-top: 34px;
+  border-top: 1px solid var(--line-bright);
+  border-left: 2px solid var(--ember-colour);
+  padding: 22px 26px;
+  background: var(--surface);
+}
+.rv-rec-label {
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--ember-colour);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.rv-rec-text {
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  line-height: 1.5;
+  max-width: 58ch;
+  margin-top: 9px;
+}
+.rv-rec-why {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  margin-top: 10px;
+  max-width: 66ch;
+  line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+  .rv-grid {
+    grid-template-columns: 1fr;
+  }
+  .rv-panel:nth-child(even) {
+    padding-left: 0;
+    border-left: none;
+  }
+}

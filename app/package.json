@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "check": "tsc --noEmit && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/styles.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/db/sessions.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/db/settings.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/engine/station.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/station/view.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/onboarding/diagnostic.test.ts"
+    "check": "tsc --noEmit && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/styles.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/db/sessions.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/db/settings.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/engine/station.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/station/view.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/onboarding/diagnostic.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/review/review.test.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/review/charts.test.ts"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

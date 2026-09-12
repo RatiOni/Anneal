@@ -209,11 +209,29 @@ Implement:
 a specific rule and specific rows, so that when a user says the advice was wrong
 the cause is findable. Never emit more than one recommendation.
 
-**Verification.**
-- [ ] Assertions over the rule set with synthetic histories, including a history
-      that should produce no recommendation at all. Confirm it produces none
-      rather than reaching for a generic one.
-- [ ] Greyscale and reduced-motion passes on every chart.
+**Verification. COMPLETE, 12 September 2026.**
+- [x] Assertions over the rule set with synthetic histories, including a week
+      where everything went well. It produces no recommendation at all rather
+      than reaching for a generic one. See `src/review/review.test.ts`.
+- [x] Chart geometry has its own suite covering the cases that mis-draw rather
+      than error: an all-zero week, a single value, negatives, and junk. No
+      coordinate can be NaN and no bar can be inverted.
+- [x] Measured in the browser on a rendered review: no contrast failures, no
+      NaN coordinates in the emitted SVG, no gradient fills, no exclamation
+      marks, no dashes, exactly one recommendation block.
+
+### A rule was deleted rather than tuned
+
+An early rule proposed "put one session at your strongest hour" whenever the
+person had not worked at that exact hour on most days. That is true of every
+healthy varied schedule, so it manufactured a finding out of ordinary variance.
+The restraint test caught it, and it was removed rather than tightened, because
+a meaningful version needs the diagnostic's stated answer to contradict. That
+is the v0.3.0 re-run idea, not this.
+
+Four rules remain, each citing the numbers it used: late sessions that all
+failed, drifting from what was declared, planning longer than you run, and
+declaring more than you finish.
 
 ## Phase 5 — Entitlement and payment
 
