@@ -8,8 +8,13 @@
 
 import type { StationState } from '../engine/station.ts';
 
-/** Never zero. A cold forge still has to be visible on screen. */
-const EMBER_MIN = 0.06;
+/**
+ * Never zero: a cold forge still has to be visible on screen. 0.06 was not.
+ * Composited over the mouth's #0e0b09 it measured 1.05:1, which is no visible
+ * difference at all, so the mouth read as an empty black window. 0.22 measures
+ * 1.33:1, which reads as dark coals while staying far from the lit 0.92.
+ */
+const EMBER_MIN = 0.22;
 const EMBER_MAX = 0.92;
 
 /** The ambient glow is the only saturated area, so it stays restrained. */
@@ -47,6 +52,24 @@ function plural(n: number, one: string, many: string): string {
   return `${n} ${n === 1 ? one : many}`;
 }
 
+/**
+ * A single session's length. Under a minute reads in seconds, because a 17
+ * second session shown as "0m" is indistinguishable from one that recorded
+ * nothing, and the difference between those two is the whole point.
+ */
+export function formatDuration(minutes: number): string {
+  const m = Number.isFinite(minutes) && minutes > 0 ? minutes : 0;
+  return m < 1 ? `${Math.round(m * 60)}s` : `${Math.round(m)}m`;
+}
+
+/** A running total. Same reasoning at the bottom end, hours and minutes above. */
+export function formatTotal(minutes: number): string {
+  const m = Number.isFinite(minutes) && minutes > 0 ? minutes : 0;
+  if (m < 1) return `${Math.round(m * 60)}s`;
+  const whole = Math.floor(m);
+  return `${Math.floor(whole / 60)}h ${whole % 60}m`;
+}
+
 function requirementLabel(requires: { hours?: number; weeksActive?: number }): string {
   if (requires.weeksActive) return `${requires.weeksActive}w`;
   if (requires.hours) return `${requires.hours}h`;
@@ -82,6 +105,16 @@ function detailFor(state: StationState): string {
     return state.marks > 0
       ? `Cold for ${days} days. Every mark you earned is still on the rack.`
       : `Cold for ${days} days.`;
+  }
+
+  // Sessions declared that recorded almost nothing. This is the most useful
+  // thing the station can say, and reporting the count alone hides it: a cold
+  // forge next to the words "2 sessions" explains nothing.
+  if (state.declaredInWindow > 0 && state.windowMinutes < state.declaredInWindow) {
+    return (
+      `${plural(state.declaredInWindow, 'session', 'sessions')} declared in the last ` +
+      `fourteen days. ${formatDuration(state.windowMinutes)} recorded.`
+    );
   }
 
   const standing = state.structures.filter((s) => s.unlocked).length;

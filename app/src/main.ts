@@ -35,7 +35,7 @@ import {
 } from './db/settings.ts';
 import { runOnboarding } from './onboarding/screen.ts';
 import { stationState } from './engine/station.ts';
-import { stationView } from './station/view.ts';
+import { stationView, formatDuration, formatTotal } from './station/view.ts';
 import { renderStation, playResponse } from './station/render.ts';
 
 // Verified location: AppData\Roaming\<identifier>\. See docs/allowed-apis.md s.3.
@@ -52,12 +52,6 @@ const station = () => el('station');
 
 function field(name: string): HTMLElement | null {
   return document.querySelector<HTMLElement>(`[data-field="${name}"]`);
-}
-
-function formatHoursMinutes(totalMinutes: number): string {
-  const whole = Math.floor(totalMinutes);
-  const hours = Math.floor(whole / 60);
-  return `${hours}h ${whole % 60}m`;
 }
 
 function say(message: string, isError = false) {
@@ -88,7 +82,7 @@ async function refreshStation() {
   renderStation(station(), stationView(state));
 
   const week = field('week');
-  if (week) week.textContent = formatHoursMinutes(state.windowMinutes);
+  if (week) week.textContent = formatTotal(state.windowMinutes);
   const cumulative = field('cumulative');
   if (cumulative) cumulative.textContent = `${Math.floor(state.cumulativeMinutes / 60)}h`;
   const light = field('light');
@@ -127,7 +121,7 @@ function renderLog(rows: SessionRow[]) {
 
     const dur = document.createElement('span');
     dur.className = 'dur mono';
-    dur.textContent = `${Math.round(minutes)}m`;
+    dur.textContent = formatDuration(minutes);
 
     li.append(when, what, dur);
     list.appendChild(li);
