@@ -35,6 +35,13 @@
   padding: 0;
 }
 
+/* Any class that sets `display` beats the browser's own `[hidden]` rule, so
+   `el.hidden = true` silently does nothing. That shipped once as a blank screen
+   after onboarding. This makes the attribute mean what it says. */
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   height: 100%;
