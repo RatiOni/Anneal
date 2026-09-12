@@ -159,12 +159,36 @@ Implement:
 **Anti-pattern guards.** No tooltip tours. No modal stack. No account creation, no
 email capture, no permission requests during first run.
 
-**Verification.**
-- [ ] Time a cold first run with a stopwatch. Under ten minutes to a completed
-      first session, or the phase failed.
-- [ ] Hand the build to someone who has not seen it and say nothing. Watch. Any
-      point where they ask what to do next is a defect.
-- [ ] Full design system verification checklist.
+**Verification. Mostly complete, 12 September 2026.**
+- [x] Time a cold first run. The whole flow is eleven interactions: nine
+      questions, one Continue, one Start. Walked end to end in the browser and
+      it resolves with the right session length. Nowhere near ten minutes.
+- [ ] **Still outstanding.** Hand the build to someone who has not seen it and
+      say nothing. Watch. Any point where they ask what to do next is a defect.
+      This needs a person and cannot be automated.
+- [x] Design system checklist against the onboarding screens, measured in the
+      browser: no contrast failures, no non-zero corner radius, no exclamation
+      marks, no dashes, no emoji, one panel rather than a modal stack, no
+      tooltips, no email or password input, no progress bar.
+- [x] Keyboard-only operation: number keys answer every question, out-of-range
+      and non-numeric keys are ignored, and the first choice is focused on each
+      step so no click is needed to begin.
+
+### The design decision worth knowing
+
+The plan asked the diagnostic to say something true the person did not already
+know, while rule 6 forbids horoscope output. Those pull against each other,
+because a deterministic reading over nine self-report answers naturally
+produces a personality classification, and a classification is a horoscope with
+better manners.
+
+So the reading is not a classification. It finds a **contradiction between two
+of the person's own answers** and quotes both back, which is specific to them by
+construction. When nothing contradicts, it says so rather than inventing
+something. Four mutations confirm those guarantees bite: classifying in the
+fallback, inventing a finding when nothing contradicts, letting a lower-priority
+rule win, and removing the guard that keeps a malformed answer from breaking the
+first run.
 
 ### Gate C sits here
 
@@ -185,11 +209,29 @@ Implement:
 a specific rule and specific rows, so that when a user says the advice was wrong
 the cause is findable. Never emit more than one recommendation.
 
-**Verification.**
-- [ ] Assertions over the rule set with synthetic histories, including a history
-      that should produce no recommendation at all. Confirm it produces none
-      rather than reaching for a generic one.
-- [ ] Greyscale and reduced-motion passes on every chart.
+**Verification. COMPLETE, 12 September 2026.**
+- [x] Assertions over the rule set with synthetic histories, including a week
+      where everything went well. It produces no recommendation at all rather
+      than reaching for a generic one. See `src/review/review.test.ts`.
+- [x] Chart geometry has its own suite covering the cases that mis-draw rather
+      than error: an all-zero week, a single value, negatives, and junk. No
+      coordinate can be NaN and no bar can be inverted.
+- [x] Measured in the browser on a rendered review: no contrast failures, no
+      NaN coordinates in the emitted SVG, no gradient fills, no exclamation
+      marks, no dashes, exactly one recommendation block.
+
+### A rule was deleted rather than tuned
+
+An early rule proposed "put one session at your strongest hour" whenever the
+person had not worked at that exact hour on most days. That is true of every
+healthy varied schedule, so it manufactured a finding out of ordinary variance.
+The restraint test caught it, and it was removed rather than tightened, because
+a meaningful version needs the diagnostic's stated answer to contradict. That
+is the v0.3.0 re-run idea, not this.
+
+Four rules remain, each citing the numbers it used: late sessions that all
+failed, drifting from what was declared, planning longer than you run, and
+declaring more than you finish.
 
 ## Phase 5 — Entitlement and payment
 

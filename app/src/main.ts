@@ -20,14 +20,28 @@ import {
   findOpenSession,
   listSessions,
   sessionsForEngine,
+  sessionsForReview,
+  setFidelity,
   HEARTBEAT_MS,
   type Db,
   type Outcome,
+  type Fidelity,
   type SessionRow,
 } from './db/sessions.ts';
+import {
+  migrateSettings,
+  setSetting,
+  setJsonSetting,
+  hasCompletedOnboarding,
+  ONBOARDING_COMPLETED_AT,
+  DIAGNOSTIC_ANSWERS,
+} from './db/settings.ts';
+import { runOnboarding } from './onboarding/screen.ts';
 import { stationState } from './engine/station.ts';
-import { stationView } from './station/view.ts';
+import { stationView, formatDuration, formatTotal } from './station/view.ts';
 import { renderStation, playResponse } from './station/render.ts';
+import { buildReview } from './review/review.ts';
+import { renderReview } from './review/screen.ts';
 
 // Verified location: AppData\Roaming\<identifier>\. See docs/allowed-apis.md s.3.
 const DB_URL = 'sqlite:sessions.db';
@@ -36,6 +50,8 @@ let db: Db;
 let openId: number | null = null;
 let plannedMinutes = 50;
 let heartbeat: ReturnType<typeof setInterval> | null = null;
+/** The session the fidelity question is currently about, if any. */
+let awaitingFidelity: number | null = null;
 
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const now = () => Date.now();
@@ -43,12 +59,6 @@ const station = () => el('station');
 
 function field(name: string): HTMLElement | null {
   return document.querySelector<HTMLElement>(`[data-field="${name}"]`);
-}
-
-function formatHoursMinutes(totalMinutes: number): string {
-  const whole = Math.floor(totalMinutes);
-  const hours = Math.floor(whole / 60);
-  return `${hours}h ${whole % 60}m`;
 }
 
 function say(message: string, isError = false) {
@@ -79,7 +89,7 @@ async function refreshStation() {
   renderStation(station(), stationView(state));
 
   const week = field('week');
-  if (week) week.textContent = formatHoursMinutes(state.windowMinutes);
+  if (week) week.textContent = formatTotal(state.windowMinutes);
   const cumulative = field('cumulative');
   if (cumulative) cumulative.textContent = `${Math.floor(state.cumulativeMinutes / 60)}h`;
   const light = field('light');
@@ -118,7 +128,7 @@ function renderLog(rows: SessionRow[]) {
 
     const dur = document.createElement('span');
     dur.className = 'dur mono';
-    dur.textContent = `${Math.round(minutes)}m`;
+    dur.textContent = formatDuration(minutes);
 
     li.append(when, what, dur);
     list.appendChild(li);
@@ -158,6 +168,8 @@ async function begin() {
 
 async function finish(outcome: Outcome) {
   if (openId === null) return;
+  const ended = openId;
+  hideFidelity();
   try {
     await endSession(db, openId, outcome, now());
     stopHeartbeat();
@@ -166,11 +178,69 @@ async function finish(outcome: Outcome) {
     // After the state is on screen, not before, so the animation lands on the
     // new values rather than the old ones.
     playResponse(station());
+    askFidelity(ended);
     return;
   } catch (error) {
     say(error instanceof Error ? error.message : String(error), true);
   }
   await render();
+}
+
+function selectDuration(minutes: number) {
+  plannedMinutes = minutes;
+  const group = document.querySelector('.duration');
+  if (!group) return;
+  let match = group.querySelector<HTMLButtonElement>(`button[data-minutes="${minutes}"]`);
+  if (!match) {
+    // The diagnostic can propose a length the fixed buttons do not offer.
+    // Offer it rather than silently rounding the person's first session.
+    match = document.createElement('button');
+    match.type = 'button';
+    match.dataset.minutes = String(minutes);
+    match.textContent = `${minutes}m`;
+    group.prepend(match);
+  }
+  for (const other of group.querySelectorAll('button')) other.removeAttribute('aria-pressed');
+  match.setAttribute('aria-pressed', 'true');
+}
+
+function askFidelity(id: number) {
+  awaitingFidelity = id;
+  el('fidelity').hidden = false;
+}
+
+function hideFidelity() {
+  awaitingFidelity = null;
+  el('fidelity').hidden = true;
+}
+
+function wireFidelity() {
+  const group = document.querySelector('.fidelity-row');
+  if (!group) return;
+  group.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-fidelity]');
+    if (!button || awaitingFidelity === null) return;
+    const id = awaitingFidelity;
+    hideFidelity();
+    // Recording the answer must never block or undo the session that already
+    // ended, so a failure here is reported and nothing else changes.
+    setFidelity(db, id, button.dataset.fidelity as Fidelity)
+      .then(() => render())
+      .catch((error) => say(error instanceof Error ? error.message : String(error), true));
+  });
+}
+
+function showView(which: 'station' | 'review') {
+  const station = which === 'station';
+  el('station').hidden = !station;
+  el('review').hidden = station;
+  el('view-station').setAttribute('aria-pressed', String(station));
+  el('view-review').setAttribute('aria-pressed', String(!station));
+  if (!station) void refreshReview();
+}
+
+async function refreshReview() {
+  renderReview(el('review'), buildReview(await sessionsForReview(db), now()));
 }
 
 function wireDurations() {
@@ -189,6 +259,7 @@ async function boot() {
   try {
     db = (await Database.load(DB_URL)) as unknown as Db;
     await migrate(db);
+    await migrateSettings(db);
   } catch (error) {
     say(
       `Could not open the database. Your history is untouched. ${
@@ -198,6 +269,18 @@ async function boot() {
     );
     return;
   }
+
+  el('begin').addEventListener('click', () => void begin());
+  el('finished').addEventListener('click', () => void finish('finished'));
+  el('cut_short').addEventListener('click', () => void finish('cut_short'));
+  el('abandoned').addEventListener('click', () => void finish('abandoned'));
+  el('intention').addEventListener('keydown', (event) => {
+    if ((event as KeyboardEvent).key === 'Enter') void begin();
+  });
+  wireDurations();
+  wireFidelity();
+  el('view-station').addEventListener('click', () => showView('station'));
+  el('view-review').addEventListener('click', () => showView('review'));
 
   // Anything a crash left open is closed at its last heartbeat and named out
   // loud. A session that vanishes silently is the worst failure this app has.
@@ -210,21 +293,27 @@ async function boot() {
     );
   }
 
-  el('begin').addEventListener('click', () => void begin());
-  el('finished').addEventListener('click', () => void finish('finished'));
-  el('cut_short').addEventListener('click', () => void finish('cut_short'));
-  el('abandoned').addEventListener('click', () => void finish('abandoned'));
-  el('intention').addEventListener('keydown', (event) => {
-    if ((event as KeyboardEvent).key === 'Enter') void begin();
-  });
-  wireDurations();
-
   // A last heartbeat on the way out narrows what a hard kill can lose.
   window.addEventListener('beforeunload', () => {
     if (openId !== null) void touchSession(db, openId, now());
   });
 
   await render();
+
+  // First run. Everything above is already wired, so if this is interrupted the
+  // app underneath is in a working state rather than half built.
+  if (!(await hasCompletedOnboarding(db))) {
+    const { answers, reading } = await runOnboarding(el('onboarding'));
+    try {
+      await setJsonSetting(db, DIAGNOSTIC_ANSWERS, answers);
+      await setSetting(db, ONBOARDING_COMPLETED_AT, String(now()));
+    } catch (error) {
+      // Losing the answers is survivable. Blocking the first session is not.
+      console.error('Could not save the diagnostic:', error);
+    }
+    selectDuration(reading.suggestedMinutes);
+    el<HTMLInputElement>('intention').focus();
+  }
 }
 
 window.addEventListener('DOMContentLoaded', () => void boot());

@@ -8,6 +8,11 @@
 
 export type Outcome = 'finished' | 'cut_short' | 'abandoned';
 
+/** Whether the time went to the thing that was declared. */
+export type Fidelity = 'yes' | 'partly' | 'no';
+
+export const FIDELITIES: readonly Fidelity[] = ['yes', 'partly', 'no'];
+
 export const OUTCOMES: readonly Outcome[] = ['finished', 'cut_short', 'abandoned'];
 
 /** Matches the shape of @tauri-apps/plugin-sql's Database. */
@@ -24,6 +29,8 @@ export interface SessionRow {
   last_seen_at: number;
   ended_at: number | null;
   outcome: Outcome | null;
+  /** Null when never answered. Unanswered is a real state, not a "no". */
+  did_declared: Fidelity | null;
 }
 
 export const MAX_INTENTION_LENGTH = 200;
@@ -59,6 +66,23 @@ export async function migrate(db: Db): Promise<void> {
   for (const statement of SCHEMA) {
     await db.execute(statement);
   }
+  await addColumnIfMissing(
+    db,
+    'did_declared',
+    `ALTER TABLE sessions ADD COLUMN did_declared TEXT
+       CHECK (did_declared IS NULL OR did_declared IN ('yes','partly','no'))`,
+  );
+}
+
+/**
+ * SQLite has no ADD COLUMN IF NOT EXISTS, and migrate() runs on every launch,
+ * so the column list is checked first. Doing this by catching the error would
+ * also swallow genuine failures.
+ */
+async function addColumnIfMissing(db: Db, column: string, ddl: string): Promise<void> {
+  const columns = await db.select<{ name: string }>(`PRAGMA table_info(sessions)`);
+  if (columns.some((c) => c.name === column)) return;
+  await db.execute(ddl);
 }
 
 function cleanIntention(raw: unknown): string {
@@ -179,6 +203,24 @@ export async function recoverOpenSessions(db: Db): Promise<SessionRow[]> {
   return open;
 }
 
+/**
+ * Records whether the session went to the declared thing. Separate from ending
+ * it on purpose: ending stays one click, and this is asked afterwards so an
+ * unanswered question never blocks the person from getting back to work.
+ */
+export async function setFidelity(db: Db, id: number, value: Fidelity): Promise<void> {
+  if (!FIDELITIES.includes(value)) {
+    throw new Error(`Unknown answer: ${String(value)}`);
+  }
+  const result = await db.execute(
+    `UPDATE sessions SET did_declared = $1 WHERE id = $2 AND ended_at IS NOT NULL`,
+    [value, id],
+  );
+  if (result.rowsAffected === 0) {
+    throw new Error(`Session ${id} is not finished.`);
+  }
+}
+
 export async function listSessions(db: Db, limit = 50): Promise<SessionRow[]> {
   const capped = Math.max(1, Math.min(Math.floor(Number(limit) || 50), 500));
   return db.select<SessionRow>(
@@ -187,7 +229,14 @@ export async function listSessions(db: Db, limit = 50): Promise<SessionRow[]> {
   );
 }
 
-/** Shape the station engine expects. See src/engine/station.mjs. */
+/** Everything the weekly review reads. Finished sessions only. */
+export async function sessionsForReview(db: Db): Promise<SessionRow[]> {
+  return db.select<SessionRow>(
+    `SELECT * FROM sessions WHERE ended_at IS NOT NULL ORDER BY started_at ASC`,
+  );
+}
+
+/** Shape the station engine expects. See src/engine/station.ts. */
 export async function sessionsForEngine(
   db: Db,
 ): Promise<{ start: number; end: number | null; outcome: Outcome | null; intention: string }[]> {

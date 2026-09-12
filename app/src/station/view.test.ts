@@ -5,7 +5,7 @@
 
 import assert from 'node:assert/strict';
 import { stationState, type SessionInput } from '../engine/station.ts';
-import { stationView } from './view.ts';
+import { stationView, formatDuration, formatTotal } from './view.ts';
 
 const DAY = 24 * 60 * 60_000;
 const MIN = 60_000;
@@ -25,7 +25,7 @@ const viewOf = (sessions: SessionInput[], now = NOW) =>
   assert.equal(v.headline, 'The forge has not been lit.');
   assert.equal(v.detail, 'Say what you are working on and start.');
   assert.equal(v.glowOpacity, 0, 'no glow before any work');
-  assert.ok(v.emberOpacity > 0, 'the forge is still drawn when cold');
+  assert.ok(v.emberOpacity >= 0.22, 'a never-lit forge is visibly dark coals, not an empty window');
   assert.equal(v.marksVisible, 0);
   assert.equal(v.legend.lastWorked, 'never');
   assert.equal(v.legend.structures, '1 of 6', 'only the forge');
@@ -110,7 +110,7 @@ const viewOf = (sessions: SessionInput[], now = NOW) =>
   for (let perDay = 0; perDay <= 120; perDay += 10) {
     const v = viewOf(Array.from({ length: 14 }, (_, i) => ses(i, perDay)));
     assert.ok(v.emberOpacity >= previous, 'ember never drops as work rises');
-    assert.ok(v.emberOpacity <= 0.92 && v.emberOpacity > 0, `bounded: ${v.emberOpacity}`);
+    assert.ok(v.emberOpacity <= 0.92 && v.emberOpacity >= 0.22, `bounded: ${v.emberOpacity}`);
     assert.ok(v.glowOpacity <= 0.45 && v.glowOpacity >= 0, `bounded: ${v.glowOpacity}`);
     previous = v.emberOpacity;
   }
@@ -132,6 +132,73 @@ const viewOf = (sessions: SessionInput[], now = NOW) =>
       !/great|well done|amazing|crushing|keep it up|nice work/i.test(text),
       `no reflexive congratulation: ${text}`,
     );
+  }
+}
+
+
+
+// --- declared sessions that recorded almost nothing ----------------------
+{
+  // Reproduces the real screen: two sessions of 17 and 2 seconds.
+  const tiny: SessionInput[] = [
+    { start: NOW - 17_000, end: NOW, outcome: 'finished' },
+    { start: NOW - 2_000, end: NOW, outcome: 'finished' },
+  ];
+  const v = viewOf(tiny);
+  assert.equal(v.headline, 'The forge is cold.');
+  assert.match(v.detail, /^2 sessions declared in the last fourteen days\./,
+    'the count is qualified as declared, not done');
+  assert.match(v.detail, /19s recorded\.$/, 'and the recorded time is stated');
+  assert.ok(!/structures standing/.test(v.detail), 'the structure count is not the story here');
+}
+
+// --- but real sessions keep the ordinary line ---------------------------
+{
+  const v = viewOf([ses(1, 45), ses(2, 50)]);
+  assert.match(v.detail, /^2 sessions in the last fourteen days\./, 'not "declared"');
+  assert.match(v.detail, /structures? standing\.$/);
+}
+
+// --- a returning user still hears about their marks first ---------------
+{
+  // A case where both rules genuinely CAN fire: the last session was 10 days
+  // ago, so the gap message applies, and it lasted 20 seconds inside the
+  // fourteen day window, so the declared-but-empty rule also applies.
+  // Without a real conflict this assertion would prove nothing.
+  const earned: SessionInput[] = [
+    ...Array.from({ length: 60 }, (_, i) => ses(60 + i, 120)),
+    { start: NOW - 10 * DAY - 20_000, end: NOW - 10 * DAY, outcome: 'finished' },
+  ];
+  const state = stationState(earned, NOW);
+  assert.ok(state.daysSinceLastSession !== null && state.daysSinceLastSession >= 7,
+    'precondition: the gap rule applies');
+  assert.ok(state.declaredInWindow > 0 && state.windowMinutes < state.declaredInWindow,
+    'precondition: the declared-but-empty rule also applies');
+
+  const v = stationView(state);
+  assert.match(v.detail, /^Cold for 10 days\./, 'the gap message outranks the newer rule');
+  assert.match(v.detail, /still on the rack\.$/, 'and still says nothing was taken');
+}
+
+// --- duration formatting -------------------------------------------------
+{
+  assert.equal(formatDuration(0), '0s');
+  assert.equal(formatDuration(17 / 60), '17s', 'a 17 second session is not "0m"');
+  assert.equal(formatDuration(2 / 60), '2s', 'and is distinguishable from a 2 second one');
+  assert.equal(formatDuration(0.99), '59s', 'just under the boundary');
+  assert.equal(formatDuration(1), '1m', 'and at it');
+  assert.equal(formatDuration(49.6), '50m');
+  for (const junk of [NaN, -5, Infinity, undefined as never, null as never]) {
+    assert.equal(formatDuration(junk), '0s', `survives ${String(junk)}`);
+  }
+
+  assert.equal(formatTotal(0), '0s');
+  assert.equal(formatTotal(0.312), '19s', 'the running total no longer reads 0h 0m');
+  assert.equal(formatTotal(1), '0h 1m');
+  assert.equal(formatTotal(61), '1h 1m');
+  assert.equal(formatTotal(213 * 60), '213h 0m');
+  for (const junk of [NaN, -5, Infinity]) {
+    assert.equal(formatTotal(junk), '0s', `survives ${String(junk)}`);
   }
 }
 
