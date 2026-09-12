@@ -7,17 +7,23 @@ Your session history is a SQLite file on your own disk. There is no account, no
 server, and nothing to sign up for. The app makes no network requests at all,
 including for its fonts, which are bundled.
 
-## Status: early alpha, phase 2 of 6
+## Status: early alpha, phase 4 of 6
 
 Honest about what exists. Do not expect a finished product.
 
 | Works | Not built yet |
 |---|---|
-| Declaring an intention and running a timed session | Onboarding and the first-run diagnostic |
-| Three outcomes: finished, cut short, abandoned | The weekly review and its charts |
-| The station, which responds to your session history | Additional domains beyond focus |
-| Crash recovery that credits work up to the last heartbeat | Sync, accounts, payment |
-| Permanent marks and structures that absence never removes | Anything but Windows |
+| A first run that tells you something true about yourself | Additional domains beyond focus |
+| Declaring an intention and running a timed session | Sync, accounts, payment |
+| Three outcomes, plus whether the time went where you aimed | Re-running the diagnostic against your own record |
+| The station, which responds to your session history | A real export |
+| A weekly review that gives you exactly one thing to change | Anything but Windows |
+| Crash recovery that credits work up to the last heartbeat | |
+| Permanent marks and structures that absence never removes | |
+
+The review gives you one recommendation, or none. When the week contains
+nothing worth saying it says so, rather than inventing advice to fill the
+space. Every recommendation cites the numbers it came from.
 
 The station is the centre of it. It is a technical drawing of a forge that
 accumulates parts as your hours accumulate. Skip a week and it goes dark.
